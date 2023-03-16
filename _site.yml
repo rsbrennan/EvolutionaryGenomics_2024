@@ -1,0 +1,13 @@
+name: "bio"
+output_dir: "."
+navbar:
+  title: "bioc 281"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Schedule"
+      href: schedule.html
+    - text: "Syllabus"
+      href: syllabus.html
+    - text: "Exercises"
+      href: exercises.html
