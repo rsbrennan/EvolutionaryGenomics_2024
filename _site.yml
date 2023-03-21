@@ -1,7 +1,7 @@
-name: "bio"
+name: "bioc 202: Fundamentals of evolutionary genomics"
 output_dir: "."
 navbar:
-  title: "bioc 281"
+  title: "bioc 202"
   left:
     - text: "Home"
       href: index.html
