@@ -1,11 +1,11 @@
-Day,Date,Topic,Tutorial_link,Lecture_slides,Other
-1,2023-05-05,"Course structure and intro,  unix/cloudlab, allele frequencies and drift",,,
-2,2023-05-08,Tutorial day 1,,,
-3,2023-05-09,Tutorial day 2,,,[Multiple testing example](https://rsbrennan.github.io/EvolutionaryGenomics/misc/multiple_testing.html)
-4,2023-05-10,Tutorial day 3,,,
-5,2023-05-11,Tutorial day 4,,,
-6,2023-05-12,Project day 1,,,
-7,2023-05-15,Project day 2,,,
-8,2023-05-16,Project day 3,,,
-9,2023-05-17,Project day 4,,,
-10,2023-05-19,Presentation Day,,,
+Class_day,Date,Day,Topic,Tutorial_link,Lecture_slides,Other
+1,05.05.23,Friday,"Course structure and intro,  unix/cloudlab, allele frequencies and drift",,,
+2,08.05.23,Monday,Tutorial day 1,,,[Multiple testing example](https://rsbrennan.github.io/EvolutionaryGenomics_2023/tutorials/multiple_testing.html)
+3,09.05.23,Tuesday,Tutorial day 2,,,[Multiple testing example](https://rsbrennan.github.io/EvolutionaryGenomics/misc/multiple_testing.html)
+4,10.05.23,Wednesday,Tutorial day 3,,,
+5,11.05.23,Thursday,Tutorial day 4,,,
+6,12.05.23,Friday,Project day 1,,,
+7,15.05.23,Monday,Project day 2,,,
+8,16.05.23,Tuesday,Project day 3,,,
+9,17.05.23,Wednesday,Project day 4,,,
+10,19.05.23,Friday,Presentation Day,,,

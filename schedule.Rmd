@@ -3,6 +3,8 @@ title: "Schedule"
 output: html_document
 ---
 
+Note that the schedule is subject to change. Check back for the most up to date information.
+
 ```{r echo = FALSE, results = 'asis',warning=FALSE,message=FALSE}
 library(knitr)
 library(kableExtra)
@@ -14,13 +16,13 @@ kbl(mytable) %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left",
                 fixed_thead = T) %>% 
   column_spec(1, bold=F, width = "3em") %>%
-  column_spec(2, bold=T, width = "8em") %>%
-  column_spec(3, width = "20em") %>%
+  column_spec(2, bold=F, width = "8em") %>%
+  column_spec(3, bold=F, width = "8em") %>%
   column_spec(4, width = "20em") %>%
   column_spec(5, width = "20em") %>%
   column_spec(6, width = "20em") %>%
+  column_spec(7, width = "20em") %>%
   row_spec(seq(1,10,2), bold = F, color = "black", background = "#FFF3C0") %>%
   row_spec(0, color = "black")
 
-```
 ```

@@ -1,9 +1,9 @@
 ---
-title: "Marine Evolutionary Genomics"
+title: "bioc 202: Fundamentals of evolutionary genomics"
 ---
 
 #### Dr. Reid Brennan
 #### Summer 2023
 #### GEOMAR
 
-Welcome! This is a master's level course designed to give a background in evolutionary genomics, predominantly relating to population genomics (though not exclusively). 
+Welcome! This is a master's level course designed to give background and practical experience in evolutionary genomics, predominantly relating to population genomics. 
