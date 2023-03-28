@@ -3,6 +3,7 @@ title: "Tutorials"
 output: html_document
 ---
 
-1. [Unix tutorial](./Tutorials/unix_tutorial.html)
-2. [Tutorial 01](./Tutorials/Class_1.html)
-3. [Tutorial 02](./Tutorials/Class_2.html)
+1. [Tutorial 01](./Tutorials/Class_1.html)
+    - [Unix tutorial](./Tutorials/unix_tutorial.html)
+
+2. [Tutorial 02](./Tutorials/Class_2.html)

@@ -2,16 +2,13 @@
 title: "All data processing"
 date: "`r Sys.Date()`"
 #output:
-#  prettydoc::html_pretty:
-#    theme: cayman
-#    highlight: github
-    #css: styles.css
-    #code_folding: show
 output:
-  html_document:
-    css: styles.css 
-
-
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+#output:
+#  html_document:
+#    css: styles.css 
 ---
 
 <style>
