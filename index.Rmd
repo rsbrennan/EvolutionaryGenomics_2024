@@ -1,9 +1,19 @@
 ---
 title: "bioc 202: Fundamentals of evolutionary genomics"
+output:
+  html_document:
+    theme: flatly
 ---
 
 #### Dr. Reid Brennan
 #### Summer 2023
 #### GEOMAR
 
-Welcome! This is a master's level course designed to give background and practical experience in evolutionary genomics, predominantly relating to population genomics. 
+Welcome! This is a master's level course designed to give background and practical experience in population genomics. The goal is that you are able to analyze and interpret population genomic data by the end of the course. This will require gaining some practical skills in bioinformatic methods as well as knowledge of the biology to be able to interpret results.
+
+We will spend the first half of the course learning methods and concepts via hands on tutorials and short lectures. During the second half you will analyze a dataset and present the results at the end of the course.
+
+See the other pages on this site for more specific information. 
+
+You can find cloudlab [here](https://lms.uni-kiel.de/auth/RepositoryEntry/5309268072/CourseNode/107413362968797) or [here](https://lms.uni-kiel.de/url/RepositoryEntry/5309268072). Remember that you need to sign in via OLAT.
+

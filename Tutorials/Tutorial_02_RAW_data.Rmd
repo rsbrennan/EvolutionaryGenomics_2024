@@ -1,0 +1,325 @@
+---
+title: "Processing raw data"
+#output:
+output:
+  html_document:
+    theme: flatly
+    #prettydoc::html_pretty:
+    #theme: cayman
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
+---
+
+<style>
+.text-box {
+  background-color: #d4e9fc;
+  color: black;
+  font-size: 14px;
+  border-radius: 5px; 
+  padding: 20px
+}
+</style>
+
+<style>
+.lecture-box {
+  background-color: #f7e1fc;
+  color: black;
+  font-size: 14px;
+  border-radius: 5px; 
+  padding: 20px
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(knitr)
+library(dplyr)
+library(tidyr)  
+```
+
+# Getting started
+<br>
+
+When the data comes back from the sequencer, it is one giant text file in fastq format that includes all data from your lane of sequencing. Remember about barcodes- we can use these to demultiplex our data (or really the sequencing center will do it for you, depending on your data type). 
+
+In general, you'll take some fairly consistent steps, with a lot of options, to process your data so you can get to the point of calling snps. These are: quality control, cleaning, and mapping.
+
+## Looking at raw data
+
+For our purposes will use just one sample to learn about data processing. This is sample, `TR-023`, which is  randomly chosen. After demultiplexing, we have two files associated with this sample: `TR-023_RA.fastq.gz` and `TR-023_RB.fastq.gz`
+
+
+<div class="text-box">
+
+Why do we have two files for one sample?
+
+</div>
+
+<br>
+
+These files are in  fastq format, shown below:
+
+```
+@J00113:190:HFV3LBBXX:7:1101:3742:1297 1:N:0:NAGCTT
+TGCAGGCTCAGTCCTGATGAGGGAGCCATCTTTATAGAAAGCAGCTGGGAGGTTGGAGGGAGCGGTCTTTGTGTGACAGCTCAGAGTGACGGCAGCTCCCTCCATCACATGGAGTACAGGATTCTGCATGATTTCTGATC
++
+FJJJJFJJJFJFJJJJAJJ-FJJFFJJJAAAAF-<AJFFFFJJJFAFFF<A7-<FFAJJJJ<JAJ7A<AJFJJJJJJJJJA-FAJA-AAFF<AF-F--AF7FAJJ77-7JJJA-7--AJJA-AFFF-----<--7--777
+@J00113:190:HFV3LBBXX:7:1101:13738:1314 1:N:0:NAGCTT
+TGCAGGACTCGTTGTTGATGAGGAAATGGTCACCACATGCTGACATTGTGGGTAAGCCAGTATTTCAAATAGTGGTTCCCAGAAAACTCCGTTCTGCAGTGTGAAAAGTTGCTCTTGATGAGTCTGGTCATTCTGGTGTA
++
+JJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJ<FJ7FJJJFJJJJJJJFJJJJJJ-<FFFJJJ-A-F)7<J-7<-<F-AFJ
+@J00113:190:HFV3LBBXX:7:1101:19015:1314 1:N:0:NAGCTT
+TGCAGGTTTAAGCTCAGAAGACGACGCCCCTGCACTGAAATACAGGAAGAAGATCTGCATGAACCAGCCTCACCTGCGGTTTGAAATCACCAGCGAGGACGGCTTCAGCGTTAAGGCTAACAGCATAGAGGGTAGGAGTG
+
+```
+<br>
+
+In the fastq file, each read consists of 4 lines:
+
+1. A sequence identifier with information about the sequencing run and the sequence
+2. The actual sequence
+3. A separator (+)
+4. the quality scores.
+
+<br>
+
+You can look at your fastq file yourself. However, these are gz files. 
+
+<div class="text-box">
+
+Try to look at your fastq file with `head`. What do you see?
+
+</div>
+ 
+<br>
+
+You need to use `zcat your_fastqFile`. Warning! This will print your whole file! You can do this and see what happens.  `control + c` will cancel the printing. 
+
+Instead, we need to use `|`, or a pipe. So we can pipe the output of `zcat` to another command, in this case `head`. 
+
+`zcat TR-023_RA.fastq.gz  | head`
+
+We can also count how many lines are in our file. you do this with `wc -l`. 
+
+<div class="text-box">
+
+Use `zcat`, `|`, and `wc -l` to count the number of reads in your fastq files.  
+
+- How many reads do you have?   
+- Do the number of forward and reverse reads agree? Why?
+
+</div>
+
+<br>
+
+## check quality
+
+We will use [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to check the quality of our sequencing. Briefly, this program scans our fastq files and checks for quality, contamination from adapters, and sequence bias, among others. 
+
+Look at the help page of fastqc using `fastqc --help`
+
+We can then run fastqc for our forward read: 
+
+```bash
+fastqc shared_materials/TR-023_RA.fastq.gz -o .
+```
+<br>
+
+<div class="text-box">
+- Modify the above code to run fastqc on your reverse read.
+- Discuss the output of fastqc together.
+</div>
+
+<br>
+
+## trim
+
+We don't have much evidence for adapter contamination with this sample, but we do see evidence for some quality issues, which are normal. We can deal with these issues by trimming. Note, this isn't totally necessary in all cases as many alignment software can deal with low quality bases.
+
+We will use [Trim Galore](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) to clean up our data. There are many programs you can use for this- we're using Trim Galore because it is relatively simple and because it auto detects adapters. 
+
+Below is the code to run this program. Again, you can get help using `trim_galore --help`
+
+```{bash, eval=F}
+trim_galore --paired \
+      shared_materials/TR-023_RA.fastq.gz \
+      shared_materials/TR-023_RB.fastq.gz \
+      -q 30 --length 30 --stringency 4
+```
+
+<br>
+
+<div class="text-box">
+
+After trim_galore finishes, run fastqc on your newly trimmed data. 
+
+- What has changed? Anything? 
+- Change the stringency, quality, or length threshold in your trim_galore command. How has this affected your results?
+
+</div>
+
+<br>
+
+# Align to reference genome
+
+We're not actually doing this! 
+
+<div class="lecture-box">
+
+Short lecture on alignment, reference genomes, and Stacks.
+
+</div>
+
+
+### Understanding mapping output
+
+Output files are in *sam* or *bam* format where bam files are compressed versions of sam files. 
+
+<div class = "text-box">
+
+Use `head` to look at your bam output. What do you see?
+
+</div>
+
+<br>
+
+We need to use another program, `samtools` to look at our bam file. Again, use `samtools --help` or just `samtools` to get an overview of this program. 
+
+The most basic tool in samtools is `samtools view`, which  prints the bam file in plain text. You can see the help page with `samtools view --help`.
+
+the basic syntax is: `samtools view NAME.bam`.... remeber `head` and `|`. 
+
+<br>
+
+<div class = "text-box">
+Look at your bam file using samtools.
+</div>
+
+<br>
+
+You should see something like this:
+
+```
+J00113:190:HFV3LBBXX:7:1223:20912:25914 163     NW_012224401.1  27218   60      150M    =       27487   409     CACACAGCTGCTGAGTAGCCAGAATATGAAAAGCAGTGTCAAGCTGTTCATATCTGGGTAAAGTTTTGAGTTTGGAAACGTATCTACAGCTGATATTACATGGTTATAATACACTGATTGATGAGCGTCTTTTCTCTGACTCATCCTGGT  AAFFFJJJJJJJJJJFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJAJJJJJJJJJJJJJJJJJFJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJAFJJJJJFFJF<FFJJJJJJJJJJJJJJJJJ      NM:i:1  MD:Z:60G89      AS:i:145        XS:i:115    RG:Z:AC-3-TR-023-023
+
+```
+
+<br>
+
+So what's going on in this file? Its a lot to digest. 
+
+```{r echo=FALSE}
+library(knitr)
+
+df <- data.frame(
+  Col = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16),
+  Field = c("QNAME", "FLAG", "RNAME", "POS", "MAPQ", "CIGAR", "RNEXT", "PNEXT", "TLEN", "SEQ", "QUAL", "NM:i:count", "MD:Z:", "AS:i:score", "XS:i:score", "RG:Z:readgroup"),
+  Brief_description = c("Query template NAME", "bitwise FLAG", "References sequence NAME", "1-based leftmost mapping POSition", "MAPping Quality", "CIGAR string", "Ref. name of the mate/next read", "Position of the mate/next read", "observed Template LENgth", "segment SEQuence", "ASCII of Phred-scaled base QUALity plus 33", "Number of differences  between the sequence and reference", "String encoding mismatched and deleted reference bases", "Alignment score generated by aligner", "Seconday alignment score", "Read group identification"),
+  our_read = c("J00113:190:HFV3LBBXX:7:1223:20912:25914", "163", "NW_012224401.1", "27218", "60", "150M", "=", "27487", "409", "CACACAG...", "AAFFFFJ...", "NM:i:1", "MD:Z:60G89", "AS:i:145", "XS:i:115", "RG:Z:AC-3-TR-023-023")
+)
+
+kable(df) %>%
+  column_spec (1:3,border_left = F, border_right = T) %>%
+kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F,
+              font_size = 10)
+
+  #kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F)  %>% 
+  #column_spec (1:3,border_left = F, border_right = T)
+
+```
+
+<br>
+
+<div class = "text-box">
+Walk through the table above together
+</div>
+
+<br>
+
+
+
+### Alignment statistics
+
+The easiest way to look at how well our mapping worked is to use `samtools flagstat TR-023.bam`, which gives us this output:
+
+<br>
+
+```
+1147073 + 0 in total (QC-passed reads + QC-failed reads)
+1124360 + 0 primary
+0 + 0 secondary
+22713 + 0 supplementary
+238412 + 0 duplicates
+234206 + 0 primary duplicates
+1127675 + 0 mapped (98.31% : N/A)
+1104962 + 0 primary mapped (98.27% : N/A)
+1124360 + 0 paired in sequencing
+562180 + 0 read1
+562180 + 0 read2
+1003448 + 0 properly paired (89.25% : N/A)
+1097766 + 0 with itself and mate mapped
+7196 + 0 singletons (0.64% : N/A)
+86662 + 0 with mate mapped to a different chr
+53567 + 0 with mate mapped to a different chr (mapQ>=5)
+```
+
+<br>
+
+<div class = "lecture-box">
+Short lecture/discussion on these results
+
+https://www.molecularecologist.com/2016/08/25/the-trouble-with-pcr-duplicates/
+
+https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/04_alignment_quality.html
+
+</div>
+
+<br>
+
+### In-depth alignment statistics
+
+<br>
+
+Remember the flags in your bam file? You can filter your reads based on this (which is  what `samtools flagstat` is doing). However, we can be more specific. The syntax to do this is: `samtools view -f # TR-023.bam`. Where `-f` can also be `-F` and `#` is the flag you want to use. 
+
+
+- `-f` to find the reads that agree with the flag statement
+- `-F` to find the reads that do not agree with the flag statement
+
+<br>
+
+At [this website](http://broadinstitute.github.io/picard/explain-flags.html) you can generate any flag definition you want (or get a flag explained). 
+
+<br>
+
+<div class = "text-box">
+
+Go to http://broadinstitute.github.io/picard/explain-flags.html
+
+How would you find the number of mapped reads in your bam file? Do this now. 
+
+- Does this number agree with `samtools flagstat`?
+
+<br>
+
+You can filter by quality by adding a `-q ##` option. A score of 20 is a common threshold. 
+
+- Count the number of mapped reads with q of 20. What do you find?
+
+<br>
+
+We can look at the mapping quality overall:
+
+```
+samtools view TR-023.bam | cut -f 5 > mapq.txt
+```
+
+- Plot a histogram of these mapping qualities in R (hint, just use `hist()`).
+
+</div>
+
+<br>
+

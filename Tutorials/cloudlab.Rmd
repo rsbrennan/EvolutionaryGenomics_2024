@@ -1,9 +1,14 @@
 ---
 title: "Class 1: Cloudlab"
 output:
-  prettydoc::html_pretty:
-    theme: cayman
-    highlight: github
+  html_document:
+    theme: flatly
+    #prettydoc::html_pretty:
+    #theme: cayman
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
 ---
 
 ```{r setup, include=FALSE}

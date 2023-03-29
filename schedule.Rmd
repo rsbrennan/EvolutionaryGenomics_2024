@@ -1,6 +1,8 @@
 ---
 title: "Schedule"
-output: html_document
+output:
+  html_document:
+    theme: flatly
 ---
 
 Note that the schedule is subject to change. Check back for the most up to date information.
