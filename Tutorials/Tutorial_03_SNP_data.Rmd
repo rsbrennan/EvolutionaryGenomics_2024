@@ -38,7 +38,9 @@ output:
 
 <br>
 
-Not doing this!
+Once we have our aligned reads that we're happy with, we need to identify variants. There are lots of ways to do this and we're not actually going to do any of them. It is fairly slow and you don't gain a lot from waiting for things to run. Instead, I already called variants with FreeBayes. We could have also used bcftools, GATK, Angsd, etc etc. 
+
+What all of these methods are doing similarly is looking for locations in the genome where there is variation. For example, one individual has a genotype of `A/G`, the other `A/A`. 
 
 <br>
 
@@ -50,28 +52,9 @@ Short snp calling lecture
 
 <br>
 
-# working with SNP data
+# Working with SNP data
 
-The most common file format for SNPs is VCF. 
-
-~/admixture_mapping/variants/all.chrom.vcf.gz
-
-vcftools
-
-## filter snps
-
-https://www.ddocent.com/filtering/
-https://evomics.org/wp-content/uploads/2022/06/Population-Genomics-Lab-1.pdf
-
-### pca
-
-add snp ids:
-
-chr1_29988
-
-need to get format right. its annoying.
-
-```bash
+```{bash eval=FALSE, echo=FALSE}
 
 zcat variants.vcf.gz | grep -v '^#' > variants_noheader.vcf
 
@@ -88,241 +71,252 @@ cut -f 2 variants_noheader.vcf | paste chr.txt - -d ":" > snp_id.txt
 cut -f 1-2 variants_noheader.vcf | paste - snp_id.txt > threecols.txt
 cut -f 4- variants_noheader.vcf | paste threecols.txt - | cat header.txt - > all.vcf
 
-
-
+vcftools --vcf all.vcf --keep indivs.txt --recode --out all_subset
 
 ```
 
-```bash
-/plink --vcf all.vcf --out variants_pruned \
---indep-pairwise 50 5 0.2 --allow-extra-chr --double-id
+<br>
+
+For most variant callling software, the output is VCF. In our case, we're only looking at SNPs, but we could also have insertions or deletions (indels). There are a number of tools we can use to work with VCF files. The most common are [VCFtools](https://vcftools.github.io/man_latest.html) and [BCFtools](https://samtools.github.io/bcftools/bcftools.html). BCFtools is a bit faster, but these two tools do basically the same things. We'll be using vcftools. You can run this by simply typing `vcftools` in the terminal.
+
+Our vcf file is `~/shared_materials/variants.vcf`. This is just a text file. 
+
+<br>
+
+<div class = "text-box">
+
+1. First look at the `head` of this file. 
+
+2. Look at the entire header with `grep`. How might you do this?
+
+3. Now use grep to look at the head of the vcf without the header. Hint, `-v` finds the inverse of your match.
+
+</div>
+
+<br>
+
+
+### vcf format
+
+The header contains a ton of information. Mostly, these are the definitions of the abbreviations used in the rest of the file, generally how the file was generated, and various other information. The real core of the vcf can be found in the last line of the header. 
+
+  #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  BC-045-001BC-046-002       BC-047-003 ...
+  chr1    11504   chr1:11504      C       G       95103.7 .       .       GT:DP:RO:QR:AO:QA:GL       .:.:.:.:.:.:.   0/0:12:12:492:0:0:0,-3.61236,-44.6308   0/0:16:16:629:0:0:0,-4.81648,-56.9351
+
+1. `CHROM` the name of the chromosome (or scaffold) of the reference genome where the variant is located.
+2. `POS`	The 1-based position of the variation on the given sequence.
+3. 	`ID`	The SNP id, many times just the CHR and POS with a `:` delimiter. Human genomes have more formal naming.
+4. `REF`	The base in the reference genome (or bases in the case of an indel). i.e., A,C,G,T.
+5. 	`ALT`	The SNP base. The A,C,G,T that doesn't match the reference.
+6	`QUAL`	A quality score associated with the variant. How confident are we that this is a real variant?
+7	`FILTER`	A flag indicating if the variant has failed or PASS if all the filters were passed successfully.
+8	`INFO`    A list of information about each site. These are defined in the header.
+9	`FORMAT`	The format of the genotype field for each sample. Also defined in the header.
+
+Each following column is an individual genotype. 
+
+<br>
+
+<div class = "text-box">
+
+Our genotype format is: 
+
+  GT:DP:RO:QR:AO:QA:GL
+
+Look up these definitions in the header and we will discuss.
+
+</div>
+
+<br>
+
+
+See [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf) for more info about the file format
+
+
+# Filtering variants
+
+I have given you a pre-filtered vcf file. This was mostly done for space, time, and computational reasons. 
+
+Filtering is hard and arbitrary. Generally, you need to consider the following:
+
+- missingness: how many samples are missing data at a site? Do any individuals have a large amount of missing data?
+- Quality: genotypes that have low quality are probably not real. You should drop these.
+- Minor allele frequency: 
+- Depth: This one is hard. There are newer methods that can use very low quality data to infer genotypes, primarily [Angsd](http://www.popgen.dk/angsd/index.php/ANGSD). For typical RADseq, you usually want some minimum (~10x?) and some maximum. Minimums make genotype calls more accurate and maximum removes sites that are likely multi-mapping or similar.
+
+Let's now look at a few quality controls in our vcf file.
+
+Note that I relied on a few existing tutorials to help build this exercise:
+- https://speciationgenomics.github.io/filtering_vcfs/
+- https://www.ddocent.com/filtering/ 
+
+Our vcf file is in the the shared folder, which you cannot write to. We can do a few things to let you type less.
+
+<br>
+
+<div class = "text-box">
+
+1. make a new directory in your home directory called `filtering` in the `my_materials` directory
+2. set some variables that we can refer to below. This means we won't have to worry about what directory we're in when running vcftools- the output will be saved to the correct location.
+
+
+```{bash, eval=FALSE}
+VCF=~/shared_materials/variants.vcf
+OUT=~/my_materials/filtering/variants
+
 ```
 
-REWRITE THIS: This command is removing SNPs in linkage using the -–indep-pairwise option. The numbers
-after the option control how plink removes these SNPs. The first number is the window size (in the
-number of variants it investigates). The second number is the frame-shift for the window size (how
-many variants the window will move between analysis). The third number is the r2 cut-off value
-(designating an upper limit for how correlated/in-linkage SNPs in a window are allowed to be). 50
-5 and 0.2 are commonly used values
+You can then call these variables by entering `$VCF` or `$OUT`
 
-make the pruned file:
+</div>
 
-```bash
-/plink --vcf all.vcf \
---extract variants_pruned.prune.in \
---make-bed --out variants_NoLD \
---allow-extra-chr --double-id
+<br>
+
+### count variants
+
+<br>
+
+<div class = "text-box">
+
+Your vcf file is relatively small. You can see the file size using `ls -lh`. It is not uncommon to have a vcf file that is many GB in size.
+
+You can count up the actual variants to get a better idea of your data quality. You should have a pretty good idea how you might do this. Hint, you'll need to use `grep -v` to ignore the header, and `wc -l ` to count. Do this now.
+
+
+</div>
+
+<br>
+
+
+### mean depth per individual
+
+``` {bash, eval=FALSE}
+vcftools --vcf $VCF --depth --out $OUT
+
 ```
 
-run the pca
-```bash
-/plink --bfile variants_NoLD \
---pca --out variants_NoLD_PCA --allow-extra-chr --double-id
+This outputs the file: `variants.idepth`
+
+### mean depth per site
+
+``` {bash, eval=FALSE}
+vcftools --vcf $VCF --site-mean-depth --out $OUT
+
 ```
 
+file: `variants.ldepth.mean`
 
-plot the pca results
+### missingness per individual
+
+``` {bash, eval=FALSE}
+vcftools --vcf $VCF --missing-indv --out $OUT
+```
+file: `variants.imiss`
+
+### missingness per site
+
+``` {bash, eval=FALSE}
+vcftools --vcf $VCF --missing-site --out $OUT
+```
+
+file: `variants.lmiss`
+
+## analyze these data in R
+
+We will plot these results in R using ggplot2. One lesson in genomics is to make a million plots and look at your data in many ways. We want to make sure nothing weird is going on. So we plot everything and think about if these plots make sense.
+
+As a reminder, we have the following files to look at:
+
+mean depth per individual: `variants.idepth`
+mean depth per site: `variants.ldepth.mean`
+Missingness per individual: `variants.imiss`
+Missingness per site: `variants.lmiss`
+Site quality: `variants.lqual`
+
+For all of the following, you need to use tidyverse.
+
 ```{r, eval=F}
 
-library(ggplot2)
-
-setwd("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching")
-
-dat <- read.table("variants_NoLD_PCA.eigenvec", header=F)
-
-colnames(dat) <- c("ID", "ID2", "PC1", "PC2", "PC3", "PC4", colnames(dat)[7:ncol(dat)])
-
-dat$population <- substr(dat$ID, 1,2)
-
-d <- ggplot(dat, aes(PC1, PC2, fill=population)) +
-        geom_point(size=4.5, shape=21, color="black") +
-        #xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-        #ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-        theme_bw() +
-        #scale_fill_manual(values=c('steelblue1','steelblue','grey45', "darkorchid2", "firebrick3"),
-  scale_fill_manual(values=c("#D3DDDC",'#6699CC',"#F2AD00","#00A08A", "#CC3333"),
-                    labels = c("Founding population","Ambient", "Acidic", 
-                               "Warming", "Greenhouse"))+
-        #theme(legend.title = element_blank())+
-       # theme(legend.text=element_text(size=8))+
-        #theme(legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'))+
-#        ggtitle("F1")+
-        #fill=c('steelblue1','steelblue','grey45', "darkorchid2", "firebrick3" )),order = 2),
-    fill=c("#D3DDDC",'#6699CC',"#F2AD00","#00A08A", "#CC3333")),order = 2),
-    shape= FALSE)
-
-#ggsave("~/tonsa_genomics/figures/pca_afs_noF3.pdf",d, w=5.5, h=3.7)
+# load tidyverse package
+library(tidyverse)
 
 ```
 
+## variant statistics
+
+### variant depth
+
+number of reads that have mapped to the position. Output is the mean across all individuals. We also see the variance.
+
+```{r, eval=F}
+variant_depth <- read_delim("~/my_materials/filtering/variants.ldepth.mean", delim = "\t",
+                            col_names = c("chr", "pos", "mean_depth", "variance_depth"), skip = 1)
+
+p <- ggplot(variant_depth, aes(mean_depth)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+  theme_classic()
+p 
+
+summary(variant_depth$mean_depth)
+
+```
+
+### variant missingness
+
+Prop of missing data for each variant
+
+```{r, eval=F}
+variant_miss <- read_delim("~/my_materials/filtering/variants.lmiss", delim = "\t",
+                       col_names = c("chr", "pos", "nchr", "nfiltered", "nmiss", "fmiss"), skip = 1)
+
+p <- ggplot(variant_miss, aes(fmiss)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) +
+  theme_classic()
+p 
+
+summary(variant_miss$fmiss)
+
+```
+
+## individual statistics
+
+### Individual mean depth
+```{r, eval=F}
+
+indiv_depth <- read_delim("~/my_materials/filtering/variants.idepth", delim = "\t",
+                        col_names = c("ind", "nsites", "depth"), skip = 1)
+
+p <- ggplot(indiv_depth, aes(depth)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+        theme_classic()
+p 
+
+```
+
+### Individual missing data
+```{r, eval=F}
+
+indiv_miss  <- read_delim("~/my_materials/filtering/variants.imiss", delim = "\t",
+                        col_names = c("ind", "ndata", "nfiltered", "nmiss", "fmiss"), skip = 1)
+p <- ggplot(indiv_miss, aes(fmiss)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+        theme_classic()
+p 
 
 
+```
 
-### admixture
+## Filtering VCF
 
-short lecture on population structure, Fst, drift.
+If we saw issues above, we could add additional filters to our data. You can do this in vcftools. It woud look something like this where you would replace $NUM with your threshold. You also need to add `recode` when writing a new vcf file. And you choose the name of your filtered vcf with the `--out` variable.
 
+See the vcftools manual for more info.
 
 ```{bash, eval=F}
-
-for K in 1 2 3 4 5 6; \
-do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
-
-```
-
-```{r, eval=F}
-
-samplelist <- read_tsv("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/indivs_subsample.txt",
-                       col_names = "sample")
-
-read_delim("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.2.Q",
-                  col_names = paste0("Q",seq(1:2)),
-                  delim=" ")
-
-
-# read in all date, in a loop
-all_data <- tibble(sample=character(),
-                   k=numeric(),
-                   Q=character(),
-                   value=numeric())
-
-head(all_data)
-
-for (k in 1:6){
-  data <- read_delim(paste0("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.",k,".Q"),
-                  col_names = paste0("Q",seq(1:k)),
-                  delim=" ")
-  data$sample <- samplelist$sample
-  data$k <- k
-  #This step converts from wide to long.
-  data %>% gather(Q, value, -sample,-k) -> data
-  all_data <- rbind(all_data,data)
-}
-
-# add the population label
-all_data$population <- substr(all_data$sample, 1, 2)
-all_data$population <- factor(all_data$population, 
-                              levels=c("GA", "PL", "HP", "BC", "PC", "TR"))
-
-# our orders are off in our vcf. lets re-order these from south to north. 
-orderlist <- read_tsv("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/population_order.txt",
-                       col_names = "sample")
-all_data$sample<-factor(all_data$sample,levels=orderlist$sample)
-
-all_data %>%
-  filter(k == 2) %>%
-  ggplot(.,aes(x=sample,y=value,fill=factor(Q))) + 
-  geom_rug(aes(x=sample, y=value, color=population)) +
-  geom_bar(stat="identity",position="stack") +
-  xlab("Sample") + ylab("Ancestry") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_fill_brewer(palette="Set1",name="K",
-                    labels=c("1","2"))
-
-# plot all k values.
-p <-  ggplot(all_data,aes(x=sample,y=value,fill=factor(Q))) + 
-  geom_bar(stat="identity",position="stack") +
-  geom_rug(aes(x=sample, color=population), inherit.aes=F) +
-  xlab("Sample") + ylab("Ancestry") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
-  scale_fill_brewer(palette="Set1",name="K",
-                    labels=seq(1:5)) +
-  facet_wrap(~k,ncol=1)
-
-
-
-ggsave("Admixture_plot.pdf", p, width = 7, height = 15, units="in")
+vcftools --vcf $VCF \
+    --max-missing $NUM \
+    --min-meanDP $NUM \
+    --max-meanDP $NUM \
+    --minDP $NUM \
+    --maxDP $NUM \
+    --recode \
+    --out filtered_vcf
 
 ```
 
-
-### fst
-
-can do big windows, then selection scan?
-
-
-https://owensgl.github.io/biol525D/Topic_8-9/fst.html
-
-```bash
-
-vcftools --gzvcf all.vcf \
---weir-fst-pop TR.pop \
---weir-fst-pop GA.pop \
---fst-window-size 25000 --out TR_GA_25kb
-
-```
-
-plot the pairwise fst density plots
-
-```{r, class.source = 'fold-hide', eval=F}
-
-# read in all in a list
-
-take all, merge, make ridgeplot for each.
-a
-a
-a
-a
-a
-
-
-```
-
-plot correlation plots
-
-### diversity
-
-these run decently fast. 
-
-
-```{bash, eval=F}
-for pop in TR PC BC HP PL GA;
-do
-  vcftools --vcf all.vcf \
-    --keep ${pop}.pop \
-    --window-pi 50000 \
-    --out ${pop}_pi_50kb;
-done
-```
-
-```{r, eval=F}
-
-# read in all in a list
-
-#take all, merge, make ridgeplot for each. 
-
-
-
-```
-
-
-
-
-## gene environment associations or selection scans.
-
-baypass? bayenv? lfmm? pcadapt is probably easiest. 
-
-
-## gwas
-
-gemma? 
-
-## intersection between the two?
-
-
-# things to do:
-
-consider parsing down to fewer chromosomes
-
-Asmixture runs too slow. drop some samples? 
-
-R libraries:
-ggplot2
-ggridges
-
-drop the funny sample PC-393-024
-Probably drop PL- it is confusing.
-
-fix the error in the vcf header that gets thrown with VCFtools.

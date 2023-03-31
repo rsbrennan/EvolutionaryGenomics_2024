@@ -1,0 +1,325 @@
+---
+title: "Population structure"
+#output:
+output:
+  html_document:
+    theme: flatly
+    #prettydoc::html_pretty:
+    #theme: cayman
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
+---
+
+
+<style>
+.text-box {
+  background-color: #d4e9fc;
+  color: black;
+  font-size: 14px;
+  border-radius: 5px; 
+  padding: 20px
+}
+</style>
+
+<style>
+.lecture-box {
+  background-color: #f7e1fc;
+  color: black;
+  font-size: 14px;
+  border-radius: 5px; 
+  padding: 20px
+}
+</style>
+
+#<br>
+#
+#<div class = "lecture-box">
+#
+#</div>
+#
+#<br>
+
+#<br>
+#
+#<div class = "text-box">
+#
+#</div>
+#
+#<br>
+
+
+# Assessing population structure
+
+<br>
+
+PCA, Admixture, Fst, isolation by distance.
+
+<br>
+
+<div class = "lecture-box">
+
+Short lecture on methods to detect population structure.
+
+</div>
+
+<br>
+
+
+```{bash eval=FALSE, echo=FALSE}
+
+```
+
+# PCA
+
+
+```bash
+/plink --vcf all.vcf --out variants_pruned \
+--indep-pairwise 50 5 0.2 --allow-extra-chr --double-id
+```
+
+REWRITE THIS: This command is removing SNPs in linkage using the -–indep-pairwise option. The numbers
+after the option control how plink removes these SNPs. The first number is the window size (in the
+number of variants it investigates). The second number is the frame-shift for the window size (how
+many variants the window will move between analysis). The third number is the r2 cut-off value
+(designating an upper limit for how correlated/in-linkage SNPs in a window are allowed to be). 50
+5 and 0.2 are commonly used values
+
+make the pruned file:
+
+```bash
+/plink --vcf all.vcf \
+--extract variants_pruned.prune.in \
+--make-bed --out variants_NoLD \
+--allow-extra-chr --double-id
+```
+
+run the pca
+```bash
+/plink --bfile variants_NoLD \
+--pca --out variants_NoLD_PCA --allow-extra-chr --double-id
+```
+
+
+plot the pca results
+```{r, eval=F}
+
+library(ggplot2)
+
+setwd("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching")
+
+dat <- read.table("variants_NoLD_PCA.eigenvec", header=F)
+
+colnames(dat) <- c("ID", "ID2", "PC1", "PC2", "PC3", "PC4", colnames(dat)[7:ncol(dat)])
+
+dat$population <- substr(dat$ID, 1,2)
+
+d <- ggplot(dat, aes(PC1, PC2, fill=population)) +
+        geom_point(size=4.5, shape=21, color="black") +
+        #xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+        #ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+        theme_bw() +
+        #scale_fill_manual(values=c('steelblue1','steelblue','grey45', "darkorchid2", "firebrick3"),
+  scale_fill_manual(values=c("#D3DDDC",'#6699CC',"#F2AD00","#00A08A", "#CC3333"),
+                    labels = c("Founding population","Ambient", "Acidic", 
+                               "Warming", "Greenhouse"))+
+        #theme(legend.title = element_blank())+
+       # theme(legend.text=element_text(size=8))+
+        #theme(legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'))+
+#        ggtitle("F1")+
+        #fill=c('steelblue1','steelblue','grey45', "darkorchid2", "firebrick3" )),order = 2),
+    fill=c("#D3DDDC",'#6699CC',"#F2AD00","#00A08A", "#CC3333")),order = 2),
+    shape= FALSE)
+
+#ggsave("~/tonsa_genomics/figures/pca_afs_noF3.pdf",d, w=5.5, h=3.7)
+
+```
+
+
+
+
+# Admixture
+
+# Fst
+
+# Isolation by distance
+
+
+add snp ids:
+
+chr1_29988
+
+need to get format right. its annoying.
+
+
+
+
+### admixture
+
+short lecture on population structure, Fst, drift.
+
+
+```{bash, eval=F}
+
+for K in 1 2 3 4 5 6; \
+do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
+
+```
+
+```{r, eval=F}
+
+samplelist <- read_tsv("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/indivs_subsample.txt",
+                       col_names = "sample")
+
+read_delim("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.2.Q",
+                  col_names = paste0("Q",seq(1:2)),
+                  delim=" ")
+
+
+# read in all date, in a loop
+all_data <- tibble(sample=character(),
+                   k=numeric(),
+                   Q=character(),
+                   value=numeric())
+
+head(all_data)
+
+for (k in 1:6){
+  data <- read_delim(paste0("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.",k,".Q"),
+                  col_names = paste0("Q",seq(1:k)),
+                  delim=" ")
+  data$sample <- samplelist$sample
+  data$k <- k
+  #This step converts from wide to long.
+  data %>% gather(Q, value, -sample,-k) -> data
+  all_data <- rbind(all_data,data)
+}
+
+# add the population label
+all_data$population <- substr(all_data$sample, 1, 2)
+all_data$population <- factor(all_data$population, 
+                              levels=c("GA", "PL", "HP", "BC", "PC", "TR"))
+
+# our orders are off in our vcf. lets re-order these from south to north. 
+orderlist <- read_tsv("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/population_order.txt",
+                       col_names = "sample")
+all_data$sample<-factor(all_data$sample,levels=orderlist$sample)
+
+all_data %>%
+  filter(k == 2) %>%
+  ggplot(.,aes(x=sample,y=value,fill=factor(Q))) + 
+  geom_rug(aes(x=sample, y=value, color=population)) +
+  geom_bar(stat="identity",position="stack") +
+  xlab("Sample") + ylab("Ancestry") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_fill_brewer(palette="Set1",name="K",
+                    labels=c("1","2"))
+
+# plot all k values.
+p <-  ggplot(all_data,aes(x=sample,y=value,fill=factor(Q))) + 
+  geom_bar(stat="identity",position="stack") +
+  geom_rug(aes(x=sample, color=population), inherit.aes=F) +
+  xlab("Sample") + ylab("Ancestry") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_fill_brewer(palette="Set1",name="K",
+                    labels=seq(1:5)) +
+  facet_wrap(~k,ncol=1)
+
+
+
+ggsave("Admixture_plot.pdf", p, width = 7, height = 15, units="in")
+
+```
+
+
+### fst
+
+can do big windows, then selection scan?
+
+
+https://owensgl.github.io/biol525D/Topic_8-9/fst.html
+
+```bash
+
+vcftools --gzvcf all.vcf \
+--weir-fst-pop TR.pop \
+--weir-fst-pop GA.pop \
+--fst-window-size 25000 --out TR_GA_25kb
+
+```
+
+plot the pairwise fst density plots
+
+```{r, class.source = 'fold-hide', eval=F}
+
+# read in all in a list
+
+take all, merge, make ridgeplot for each.
+a
+a
+a
+a
+a
+
+
+```
+
+plot correlation plots
+
+### diversity
+
+these run decently fast. 
+
+
+```{bash, eval=F}
+for pop in TR PC BC HP PL GA;
+do
+  vcftools --vcf all.vcf \
+    --keep ${pop}.pop \
+    --window-pi 50000 \
+    --out ${pop}_pi_50kb;
+done
+```
+
+```{r, eval=F}
+
+# read in all in a list
+
+#take all, merge, make ridgeplot for each. 
+
+
+
+```
+
+
+
+
+## gene environment associations or selection scans.
+
+baypass? bayenv? lfmm? pcadapt is probably easiest. 
+
+
+## gwas
+
+gemma? 
+
+## intersection between the two?
+
+
+# things to do:
+
+consider parsing down to fewer chromosomes
+
+Asmixture runs too slow. drop some samples? 
+
+R libraries:
+ggplot2
+ggridges
+
+drop the funny sample PC-393-024
+Probably drop PL- it is confusing.
+
+fix the error in the vcf header that gets thrown with VCFtools.

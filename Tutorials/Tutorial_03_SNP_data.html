@@ -1640,7 +1640,16 @@ div.tocify {
 <div id="call-snps" class="section level1">
 <h1>Call snps</h1>
 <p><br></p>
-<p>Not doing this!</p>
+<p>Once we have our aligned reads that we’re happy with, we need to
+identify variants. There are lots of ways to do this and we’re not
+actually going to do any of them. It is fairly slow and you don’t gain a
+lot from waiting for things to run. Instead, I already called variants
+with FreeBayes. We could have also used bcftools, GATK, Angsd, etc
+etc.</p>
+<p>What all of these methods are doing similarly is looking for
+locations in the genome where there is variation. For example, one
+individual has a genotype of <code>A/G</code>, the other
+<code>A/A</code>.</p>
 <p><br></p>
 <div class="lecture-box">
 <p>Short snp calling lecture</p>
@@ -1648,208 +1657,222 @@ div.tocify {
 <p><br></p>
 </div>
 <div id="working-with-snp-data" class="section level1">
-<h1>working with SNP data</h1>
-<p>The most common file format for SNPs is VCF.</p>
-<p>~/admixture_mapping/variants/all.chrom.vcf.gz</p>
-<p>vcftools</p>
-<div id="filter-snps" class="section level2">
-<h2>filter snps</h2>
-<p><a href="https://www.ddocent.com/filtering/" class="uri">https://www.ddocent.com/filtering/</a> <a href="https://evomics.org/wp-content/uploads/2022/06/Population-Genomics-Lab-1.pdf" class="uri">https://evomics.org/wp-content/uploads/2022/06/Population-Genomics-Lab-1.pdf</a></p>
-<div id="pca" class="section level3">
-<h3>pca</h3>
-<p>add snp ids:</p>
-<p>chr1_29988</p>
-<p>need to get format right. its annoying.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> variants.vcf.gz <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-v</span> <span class="st">&#39;^#&#39;</span> <span class="op">&gt;</span> variants_noheader.vcf</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-v</span> <span class="st">&quot;NW_&quot;</span> variants_noheader.vcf <span class="op">&gt;</span> variants_noheader.vcf2</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-Ew</span> <span class="st">&quot;chr1|chr2|chr3|chr4|chr5&quot;</span> variants_noheader.vcf2 <span class="op">&gt;</span> variants_noheader.vcf3</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> variants_noheader.vcf3 variants_noheader.vcf</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> variants_noheader.vcf2</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">zcat</span> variants.vcf.gz <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&#39;^#&#39;</span> <span class="op">&gt;</span> header.txt</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cut</span> <span class="at">-f</span> 1 variants_noheader.vcf  <span class="op">&gt;</span> chr.txt</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cut</span> <span class="at">-f</span> 2 variants_noheader.vcf <span class="kw">|</span> <span class="fu">paste</span> chr.txt <span class="at">-</span> <span class="at">-d</span> <span class="st">&quot;:&quot;</span> <span class="op">&gt;</span> snp_id.txt</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cut</span> <span class="at">-f</span> 1-2 variants_noheader.vcf <span class="kw">|</span> <span class="fu">paste</span> <span class="at">-</span> snp_id.txt <span class="op">&gt;</span> threecols.txt</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cut</span> <span class="at">-f</span> 4- variants_noheader.vcf <span class="kw">|</span> <span class="fu">paste</span> threecols.txt <span class="at">-</span> <span class="kw">|</span> <span class="fu">cat</span> header.txt <span class="at">-</span> <span class="op">&gt;</span> all.vcf</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/plink</span> <span class="at">--vcf</span> all.vcf <span class="at">--out</span> variants_pruned <span class="dt">\</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>--indep-pairwise 50 5 0.2 <span class="at">--allow-extra-chr</span> <span class="at">--double-id</span></span></code></pre></div>
-<p>REWRITE THIS: This command is removing SNPs in linkage using the
--–indep-pairwise option. The numbers after the option control how plink
-removes these SNPs. The first number is the window size (in the number
-of variants it investigates). The second number is the frame-shift for
-the window size (how many variants the window will move between
-analysis). The third number is the r2 cut-off value (designating an
-upper limit for how correlated/in-linkage SNPs in a window are allowed
-to be). 50 5 and 0.2 are commonly used values</p>
-<p>make the pruned file:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/plink</span> <span class="at">--vcf</span> all.vcf <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>--extract variants_pruned.prune.in <span class="dt">\</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>--make-bed <span class="at">--out</span> variants_NoLD <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>--allow-extra-chr <span class="at">--double-id</span></span></code></pre></div>
-<p>run the pca</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/plink</span> <span class="at">--bfile</span> variants_NoLD <span class="dt">\</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>--pca <span class="at">--out</span> variants_NoLD_PCA <span class="at">--allow-extra-chr</span> <span class="at">--double-id</span></span></code></pre></div>
-<p>plot the pca results</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">&quot;~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching&quot;</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;variants_NoLD_PCA.eigenvec&quot;</span>, <span class="at">header=</span>F)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(dat) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ID&quot;</span>, <span class="st">&quot;ID2&quot;</span>, <span class="st">&quot;PC1&quot;</span>, <span class="st">&quot;PC2&quot;</span>, <span class="st">&quot;PC3&quot;</span>, <span class="st">&quot;PC4&quot;</span>, <span class="fu">colnames</span>(dat)[<span class="dv">7</span><span class="sc">:</span><span class="fu">ncol</span>(dat)])</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>dat<span class="sc">$</span>population <span class="ot">&lt;-</span> <span class="fu">substr</span>(dat<span class="sc">$</span>ID, <span class="dv">1</span>,<span class="dv">2</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(PC1, PC2, <span class="at">fill=</span>population)) <span class="sc">+</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_point</span>(<span class="at">size=</span><span class="fl">4.5</span>, <span class="at">shape=</span><span class="dv">21</span>, <span class="at">color=</span><span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">#xlab(paste0(&quot;PC1: &quot;,percentVar[1],&quot;% variance&quot;)) +</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">#ylab(paste0(&quot;PC2: &quot;,percentVar[2],&quot;% variance&quot;)) +</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">#scale_fill_manual(values=c(&#39;steelblue1&#39;,&#39;steelblue&#39;,&#39;grey45&#39;, &quot;darkorchid2&quot;, &quot;firebrick3&quot;),</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">&quot;#D3DDDC&quot;</span>,<span class="st">&#39;#6699CC&#39;</span>,<span class="st">&quot;#F2AD00&quot;</span>,<span class="st">&quot;#00A08A&quot;</span>, <span class="st">&quot;#CC3333&quot;</span>),</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Founding population&quot;</span>,<span class="st">&quot;Ambient&quot;</span>, <span class="st">&quot;Acidic&quot;</span>, </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;Warming&quot;</span>, <span class="st">&quot;Greenhouse&quot;</span>))<span class="sc">+</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">#theme(legend.title = element_blank())+</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>       <span class="co"># theme(legend.text=element_text(size=8))+</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="co">#theme(legend.background = element_rect(colour = &#39;black&#39;, fill = &#39;white&#39;, linetype=&#39;solid&#39;))+</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#        ggtitle(&quot;F1&quot;)+</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="co">#fill=c(&#39;steelblue1&#39;,&#39;steelblue&#39;,&#39;grey45&#39;, &quot;darkorchid2&quot;, &quot;firebrick3&quot; )),order = 2),</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    fill<span class="ot">=</span><span class="fu">c</span>(<span class="st">&quot;#D3DDDC&quot;</span>,<span class="st">&#39;#6699CC&#39;</span>,<span class="st">&quot;#F2AD00&quot;</span>,<span class="st">&quot;#00A08A&quot;</span>, <span class="st">&quot;#CC3333&quot;</span>)<span class="er">)</span>,order <span class="ot">=</span> <span class="dv">2</span><span class="er">)</span>,</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    shape<span class="ot">=</span> <span class="cn">FALSE</span><span class="er">)</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co">#ggsave(&quot;~/tonsa_genomics/figures/pca_afs_noF3.pdf&quot;,d, w=5.5, h=3.7)</span></span></code></pre></div>
+<h1>Working with SNP data</h1>
+<p><br></p>
+<p>For most variant callling software, the output is VCF. In our case,
+we’re only looking at SNPs, but we could also have insertions or
+deletions (indels). There are a number of tools we can use to work with
+VCF files. The most common are <a href="https://vcftools.github.io/man_latest.html">VCFtools</a> and <a href="https://samtools.github.io/bcftools/bcftools.html">BCFtools</a>.
+BCFtools is a bit faster, but these two tools do basically the same
+things. We’ll be using vcftools. You can run this by simply typing
+<code>vcftools</code> in the terminal.</p>
+<p>Our vcf file is <code>~/shared_materials/variants.vcf</code>. This is
+just a text file.</p>
+<p><br></p>
+<div class="text-box">
+<ol style="list-style-type: decimal">
+<li><p>First look at the <code>head</code> of this file.</p></li>
+<li><p>Look at the entire header with <code>grep</code>. How might you
+do this?</p></li>
+<li><p>Now use grep to look at the head of the vcf without the header.
+Hint, <code>-v</code> finds the inverse of your match.</p></li>
+</ol>
 </div>
-<div id="admixture" class="section level3">
-<h3>admixture</h3>
-<p>short lecture on population structure, Fst, drift.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> K <span class="kw">in</span> 1 2 3 4 5 6<span class="kw">;</span> <span class="dt">\</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="ex">admixture</span> <span class="at">--cv</span> variants_NoLD.bed <span class="va">$K</span> <span class="kw">|</span> <span class="fu">tee</span> log<span class="va">${K}</span>.out<span class="kw">;</span> <span class="cf">done</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>samplelist <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/indivs_subsample.txt&quot;</span>,</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">col_names =</span> <span class="st">&quot;sample&quot;</span>)</span>
+<p><br></p>
+<div id="vcf-format" class="section level3">
+<h3>vcf format</h3>
+<p>The header contains a ton of information. Mostly, these are the
+definitions of the abbreviations used in the rest of the file, generally
+how the file was generated, and various other information. The real core
+of the vcf can be found in the last line of the header.</p>
+<p>#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT BC-045-001BC-046-002
+BC-047-003 … chr1 11504 chr1:11504 C G 95103.7 . . GT:DP:RO:QR:AO:QA:GL
+.:.:.:.:.:.:. 0/0:12:12:492:0:0:0,-3.61236,-44.6308
+0/0:16:16:629:0:0:0,-4.81648,-56.9351</p>
+<ol style="list-style-type: decimal">
+<li><code>CHROM</code> the name of the chromosome (or scaffold) of the
+reference genome where the variant is located.</li>
+<li><code>POS</code> The 1-based position of the variation on the given
+sequence.</li>
+<li><code>ID</code> The SNP id, many times just the CHR and POS with a
+<code>:</code> delimiter. Human genomes have more formal naming.</li>
+<li><code>REF</code> The base in the reference genome (or bases in the
+case of an indel). i.e., A,C,G,T.</li>
+<li><code>ALT</code> The SNP base. The A,C,G,T that doesn’t match the
+reference. 6 <code>QUAL</code> A quality score associated with the
+variant. How confident are we that this is a real variant? 7
+<code>FILTER</code> A flag indicating if the variant has failed or PASS
+if all the filters were passed successfully. 8 <code>INFO</code> A list
+of information about each site. These are defined in the header. 9
+<code>FORMAT</code> The format of the genotype field for each sample.
+Also defined in the header.</li>
+</ol>
+<p>Each following column is an individual genotype.</p>
+<p><br></p>
+<div class="text-box">
+<p>Our genotype format is:</p>
+<p>GT:DP:RO:QR:AO:QA:GL</p>
+<p>Look up these definitions in the header and we will discuss.</p>
+</div>
+<p><br></p>
+<p>See <a href="https://samtools.github.io/hts-specs/VCFv4.2.pdf">here</a> for
+more info about the file format</p>
+</div>
+</div>
+<div id="filtering-variants" class="section level1">
+<h1>Filtering variants</h1>
+<p>I have given you a pre-filtered vcf file. This was mostly done for
+space, time, and computational reasons.</p>
+<p>Filtering is hard and arbitrary. Generally, you need to consider the
+following:</p>
+<ul>
+<li>missingness: how many samples are missing data at a site? Do any
+individuals have a large amount of missing data?</li>
+<li>Quality: genotypes that have low quality are probably not real. You
+should drop these.</li>
+<li>Minor allele frequency:</li>
+<li>Depth: This one is hard. There are newer methods that can use very
+low quality data to infer genotypes, primarily <a href="http://www.popgen.dk/angsd/index.php/ANGSD">Angsd</a>. For typical
+RADseq, you usually want some minimum (~10x?) and some maximum. Minimums
+make genotype calls more accurate and maximum removes sites that are
+likely multi-mapping or similar.</li>
+</ul>
+<p>Let’s now look at a few quality controls in our vcf file.</p>
+<p>Note that I relied on a few existing tutorials to help build this
+exercise: - <a href="https://speciationgenomics.github.io/filtering_vcfs/" class="uri">https://speciationgenomics.github.io/filtering_vcfs/</a> -
+<a href="https://www.ddocent.com/filtering/" class="uri">https://www.ddocent.com/filtering/</a></p>
+<p>Our vcf file is in the the shared folder, which you cannot write to.
+We can do a few things to let you type less.</p>
+<p><br></p>
+<div class="text-box">
+<ol style="list-style-type: decimal">
+<li>make a new directory in your home directory called
+<code>filtering</code> in the <code>my_materials</code> directory</li>
+<li>set some variables that we can refer to below. This means we won’t
+have to worry about what directory we’re in when running vcftools- the
+output will be saved to the correct location.</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">VCF</span><span class="op">=</span>~/shared_materials/variants.vcf</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">OUT</span><span class="op">=</span>~/my_materials/filtering/variants</span></code></pre></div>
+<p>You can then call these variables by entering <code>$VCF</code> or
+<code>$OUT</code></p>
+</div>
+<p><br></p>
+<div id="count-variants" class="section level3">
+<h3>count variants</h3>
+<p><br></p>
+<div class="text-box">
+<p>Your vcf file is relatively small. You can see the file size using
+<code>ls -lh</code>. It is not uncommon to have a vcf file that is many
+GB in size.</p>
+<p>You can count up the actual variants to get a better idea of your
+data quality. You should have a pretty good idea how you might do this.
+Hint, you’ll need to use <code>grep -v</code> to ignore the header, and
+<code>wc -l</code> to count. Do this now.</p>
+</div>
+<p><br></p>
+</div>
+<div id="mean-depth-per-individual" class="section level3">
+<h3>mean depth per individual</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="at">--depth</span> <span class="at">--out</span> <span class="va">$OUT</span></span></code></pre></div>
+<p>This outputs the file: <code>variants.idepth</code></p>
+</div>
+<div id="mean-depth-per-site" class="section level3">
+<h3>mean depth per site</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="at">--site-mean-depth</span> <span class="at">--out</span> <span class="va">$OUT</span></span></code></pre></div>
+<p>file: <code>variants.ldepth.mean</code></p>
+</div>
+<div id="missingness-per-individual" class="section level3">
+<h3>missingness per individual</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="at">--missing-indv</span> <span class="at">--out</span> <span class="va">$OUT</span></span></code></pre></div>
+<p>file: <code>variants.imiss</code></p>
+</div>
+<div id="missingness-per-site" class="section level3">
+<h3>missingness per site</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="at">--missing-site</span> <span class="at">--out</span> <span class="va">$OUT</span></span></code></pre></div>
+<p>file: <code>variants.lmiss</code></p>
+</div>
+<div id="analyze-these-data-in-r" class="section level2">
+<h2>analyze these data in R</h2>
+<p>We will plot these results in R using ggplot2. One lesson in genomics
+is to make a million plots and look at your data in many ways. We want
+to make sure nothing weird is going on. So we plot everything and think
+about if these plots make sense.</p>
+<p>As a reminder, we have the following files to look at:</p>
+<p>mean depth per individual: <code>variants.idepth</code> mean depth
+per site: <code>variants.ldepth.mean</code> Missingness per individual:
+<code>variants.imiss</code> Missingness per site:
+<code>variants.lmiss</code> Site quality:
+<code>variants.lqual</code></p>
+<p>For all of the following, you need to use tidyverse.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load tidyverse package</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
+</div>
+<div id="variant-statistics" class="section level2">
+<h2>variant statistics</h2>
+<div id="variant-depth" class="section level3">
+<h3>variant depth</h3>
+<p>number of reads that have mapped to the position. Output is the mean
+across all individuals. We also see the variance.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>variant_depth <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.ldepth.mean&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;pos&quot;</span>, <span class="st">&quot;mean_depth&quot;</span>, <span class="st">&quot;variance_depth&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">read_delim</span>(<span class="st">&quot;~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.2.Q&quot;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">col_names =</span> <span class="fu">paste0</span>(<span class="st">&quot;Q&quot;</span>,<span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)),</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">delim=</span><span class="st">&quot; &quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_depth, <span class="fu">aes</span>(mean_depth)) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>p </span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># read in all date, in a loop</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>all_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">sample=</span><span class="fu">character</span>(),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                   <span class="at">k=</span><span class="fu">numeric</span>(),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                   <span class="at">Q=</span><span class="fu">character</span>(),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                   <span class="at">value=</span><span class="fu">numeric</span>())</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_data)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>){</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="fu">paste0</span>(<span class="st">&quot;~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.&quot;</span>,k,<span class="st">&quot;.Q&quot;</span>),</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>                  <span class="at">col_names =</span> <span class="fu">paste0</span>(<span class="st">&quot;Q&quot;</span>,<span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span>k)),</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                  <span class="at">delim=</span><span class="st">&quot; &quot;</span>)</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  data<span class="sc">$</span>sample <span class="ot">&lt;-</span> samplelist<span class="sc">$</span>sample</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  data<span class="sc">$</span>k <span class="ot">&lt;-</span> k</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#This step converts from wide to long.</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span> <span class="fu">gather</span>(Q, value, <span class="sc">-</span>sample,<span class="sc">-</span>k) <span class="ot">-&gt;</span> data</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  all_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(all_data,data)</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># add the population label</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>all_data<span class="sc">$</span>population <span class="ot">&lt;-</span> <span class="fu">substr</span>(all_data<span class="sc">$</span>sample, <span class="dv">1</span>, <span class="dv">2</span>)</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>all_data<span class="sc">$</span>population <span class="ot">&lt;-</span> <span class="fu">factor</span>(all_data<span class="sc">$</span>population, </span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>                              <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;GA&quot;</span>, <span class="st">&quot;PL&quot;</span>, <span class="st">&quot;HP&quot;</span>, <span class="st">&quot;BC&quot;</span>, <span class="st">&quot;PC&quot;</span>, <span class="st">&quot;TR&quot;</span>))</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="co"># our orders are off in our vcf. lets re-order these from south to north. </span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>orderlist <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/population_order.txt&quot;</span>,</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>                       <span class="at">col_names =</span> <span class="st">&quot;sample&quot;</span>)</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>all_data<span class="sc">$</span>sample<span class="ot">&lt;-</span><span class="fu">factor</span>(all_data<span class="sc">$</span>sample,<span class="at">levels=</span>orderlist<span class="sc">$</span>sample)</span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>all_data <span class="sc">%&gt;%</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(k <span class="sc">==</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(.,<span class="fu">aes</span>(<span class="at">x=</span>sample,<span class="at">y=</span>value,<span class="at">fill=</span><span class="fu">factor</span>(Q))) <span class="sc">+</span> </span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="fu">aes</span>(<span class="at">x=</span>sample, <span class="at">y=</span>value, <span class="at">color=</span>population)) <span class="sc">+</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">&quot;identity&quot;</span>,<span class="at">position=</span><span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Sample&quot;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Ancestry&quot;</span>) <span class="sc">+</span></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette=</span><span class="st">&quot;Set1&quot;</span>,<span class="at">name=</span><span class="st">&quot;K&quot;</span>,</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels=</span><span class="fu">c</span>(<span class="st">&quot;1&quot;</span>,<span class="st">&quot;2&quot;</span>))</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="co"># plot all k values.</span></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span>  <span class="fu">ggplot</span>(all_data,<span class="fu">aes</span>(<span class="at">x=</span>sample,<span class="at">y=</span>value,<span class="at">fill=</span><span class="fu">factor</span>(Q))) <span class="sc">+</span> </span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">&quot;identity&quot;</span>,<span class="at">position=</span><span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="fu">aes</span>(<span class="at">x=</span>sample, <span class="at">color=</span>population), <span class="at">inherit.aes=</span>F) <span class="sc">+</span></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Sample&quot;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Ancestry&quot;</span>) <span class="sc">+</span></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">60</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette=</span><span class="st">&quot;Set1&quot;</span>,<span class="at">name=</span><span class="st">&quot;K&quot;</span>,</span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>                    <span class="at">labels=</span><span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>k,<span class="at">ncol=</span><span class="dv">1</span>)</span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">&quot;Admixture_plot.pdf&quot;</span>, p, <span class="at">width =</span> <span class="dv">7</span>, <span class="at">height =</span> <span class="dv">15</span>, <span class="at">units=</span><span class="st">&quot;in&quot;</span>)</span></code></pre></div>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_depth<span class="sc">$</span>mean_depth)</span></code></pre></div>
 </div>
-<div id="fst" class="section level3">
-<h3>fst</h3>
-<p>can do big windows, then selection scan?</p>
-<p><a href="https://owensgl.github.io/biol525D/Topic_8-9/fst.html" class="uri">https://owensgl.github.io/biol525D/Topic_8-9/fst.html</a></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--gzvcf</span> all.vcf <span class="dt">\</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>--weir-fst-pop TR.pop <span class="dt">\</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>--weir-fst-pop GA.pop <span class="dt">\</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>--fst-window-size 25000 <span class="at">--out</span> TR_GA_25kb</span></code></pre></div>
-<p>plot the pairwise fst density plots</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r fold-hide"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in all in a list</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>take all, merge, make ridgeplot <span class="cf">for</span> each.</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div>
-<p>plot correlation plots</p>
-</div>
-<div id="diversity" class="section level3">
-<h3>diversity</h3>
-<p>these run decently fast.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> pop <span class="kw">in</span> TR PC BC HP PL GA<span class="kw">;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">vcftools</span> <span class="at">--vcf</span> all.vcf <span class="dt">\</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--keep</span> <span class="va">${pop}</span>.pop <span class="dt">\</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">--window-pi</span> 50000 <span class="dt">\</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--out</span> <span class="va">${pop}</span>_pi_50kb<span class="kw">;</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in all in a list</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#take all, merge, make ridgeplot for each. </span></span></code></pre></div>
+<div id="variant-missingness" class="section level3">
+<h3>variant missingness</h3>
+<p>Prop of missing data for each variant</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>variant_miss <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.lmiss&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;pos&quot;</span>, <span class="st">&quot;nchr&quot;</span>, <span class="st">&quot;nfiltered&quot;</span>, <span class="st">&quot;nmiss&quot;</span>, <span class="st">&quot;fmiss&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_miss, <span class="fu">aes</span>(fmiss)) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_miss<span class="sc">$</span>fmiss)</span></code></pre></div>
 </div>
 </div>
-<div id="gene-environment-associations-or-selection-scans." class="section level2">
-<h2>gene environment associations or selection scans.</h2>
-<p>baypass? bayenv? lfmm? pcadapt is probably easiest.</p>
+<div id="individual-statistics" class="section level2">
+<h2>individual statistics</h2>
+<div id="individual-mean-depth" class="section level3">
+<h3>Individual mean depth</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>indiv_depth <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.idepth&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;ind&quot;</span>, <span class="st">&quot;nsites&quot;</span>, <span class="st">&quot;depth&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_depth, <span class="fu">aes</span>(depth)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>p </span></code></pre></div>
 </div>
-<div id="gwas" class="section level2">
-<h2>gwas</h2>
-<p>gemma?</p>
+<div id="individual-missing-data" class="section level3">
+<h3>Individual missing data</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>indiv_miss  <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.imiss&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;ind&quot;</span>, <span class="st">&quot;ndata&quot;</span>, <span class="st">&quot;nfiltered&quot;</span>, <span class="st">&quot;nmiss&quot;</span>, <span class="st">&quot;fmiss&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_miss, <span class="fu">aes</span>(fmiss)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>p </span></code></pre></div>
 </div>
-<div id="intersection-between-the-two" class="section level2">
-<h2>intersection between the two?</h2>
 </div>
+<div id="filtering-vcf" class="section level2">
+<h2>Filtering VCF</h2>
+<p>If we saw issues above, we could add additional filters to our data.
+You can do this in vcftools. It woud look something like this where you
+would replace $NUM with your threshold. You also need to add
+<code>recode</code> when writing a new vcf file. And you choose the name
+of your filtered vcf with the <code>--out</code> variable.</p>
+<p>See the vcftools manual for more info.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="dt">\</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--max-missing</span> <span class="va">$NUM</span> <span class="dt">\</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--min-meanDP</span> <span class="va">$NUM</span> <span class="dt">\</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--max-meanDP</span> <span class="va">$NUM</span> <span class="dt">\</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">--minDP</span> <span class="va">$NUM</span> <span class="dt">\</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">--maxDP</span> <span class="va">$NUM</span> <span class="dt">\</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">--recode</span> <span class="dt">\</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">--out</span> filtered_vcf</span></code></pre></div>
 </div>
-<div id="things-to-do" class="section level1">
-<h1>things to do:</h1>
-<p>consider parsing down to fewer chromosomes</p>
-<p>Asmixture runs too slow. drop some samples?</p>
-<p>R libraries: ggplot2 ggridges</p>
-<p>drop the funny sample PC-393-024 Probably drop PL- it is
-confusing.</p>
-<p>fix the error in the vcf header that gets thrown with VCFtools.</p>
 </div>
 
 
