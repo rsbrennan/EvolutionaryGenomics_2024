@@ -12,4 +12,4 @@ navbar:
     - text: "Tutorials"
       href: tutorials.html
     - text: "Independent Projects"
-      href: ./independent_project_files/project_overview.html
+      href: project_overview.html
