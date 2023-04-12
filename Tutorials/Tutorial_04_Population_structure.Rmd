@@ -4,8 +4,6 @@ title: "Population structure"
 output:
   html_document:
     theme: flatly
-    #prettydoc::html_pretty:
-    #theme: cayman
     highlight: tango
     toc: true
     toc_float: true

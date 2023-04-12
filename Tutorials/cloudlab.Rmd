@@ -1,5 +1,5 @@
 ---
-title: "Class 1: Cloudlab"
+title: "Cloudlab"
 output:
   html_document:
     theme: flatly
@@ -29,8 +29,6 @@ library(tidyr)
 }
 </style>
 
-# Cloudlab
-
 We're going to be doing our analyses on cloudlab, hosted by CAU. Cloudlab is super nice for this course because you won't have to run anything on your computer. Instead, you can login via a web browser and run everything remotely in [JupyterLab](https://jupyter.org/). I have pre-installed all the necessary R packages and other bioinformatic programs. Also all data you'll need has been uploaded. 
 
 You should all have access to cloudlab at the following link via OLAT:
@@ -48,19 +46,31 @@ You will be asked to login via OLAT. After this you should see the following scr
 ![](images/cloudlab_1.png){width=600px}
 </center>
 
+<br>
+
 You then need to go to `bioc202`, on the left side where you can click the `LTI-Lerninhalt anzeigen` button to be taken to cloud lab.
+
+<br>
 
 <center>
 ![](images/cloudlab_2.png){width=600px}
 </center>
 
+<br>
+
 Then you should see the following jupyterlab screen
+
+<br>
 
 <center>
 ![](images/cloudlab_3.png){width=600px}
 </center>
 
+<br>
+
 ## Working in cloudlab
+
+<br>
 
 Within your environment, there are a few things to keep in mind. 
 
@@ -68,13 +78,21 @@ There are two main places things are stored:
 - `shared_materials`
 - `my_materials`
 
+<br>
+
 `shared_materials` is where the class wide files live- datasets, etc. 
+
+<br>
 
 `my_materials` is where you will save your own files. **any data or files your generate that are not saves in `my_materials` will be deleted when you log out!** 
 
+<br>
+
 You can download files to your computer by right clicking on a file and selecting `download`. Alternatively, you can upload to `my_materials` by highlighting that folder and clicking the up arrow. 
 
-You'll see large buttons for R Studio or terminal. Generally, we will run most analyses in the terminal and plot things in R. 
+You'll see large buttons for R Studio or terminal. We will run most analyses in the terminal and plot things in R. 
+
+<br>
 
 <div class="text-box">
 
@@ -82,25 +100,3 @@ Go to Cloudlab and make sure you have access. We'll look at things together.
 
 </div>
 
-# unix tutorial
-
-
-
-
-
-# Lecture: NGS, WGS, RAD-seq, etc
-
-Illumina, explain barcodes.
-
-https://learn.gencore.bio.nyu.edu/ngs-file-formats/sambam-format/
-
-#### exercise
-how many cut sites do we expect in a 1GB genome?
-
-
-http://marinetics.org/teaching/hts/20150530RADSeq.pdf
-https://marinetics.org/teaching/hts/Trimming.html
-
-https://marineomics.github.io/RADseq.html#First,_look_at_the_raw_data
-
-https://wikis.utexas.edu/display/bioiteam/in+silico+digestion
