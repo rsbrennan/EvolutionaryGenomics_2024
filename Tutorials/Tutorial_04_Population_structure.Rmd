@@ -73,11 +73,22 @@ Short lecture on methods to detect population structure.
 
 # PCA
 
+```{bash, eval=FALSE}
+VCF=~/shared_materials/variants.vcf
+# under /my_materials
+mkdir population_structure
+cd population_structure
+
+```
 
 ```bash
-/plink --vcf all.vcf --out variants_pruned \
---indep-pairwise 50 5 0.2 --allow-extra-chr --double-id
+plink --vcf $VCF \
+        --indep-pairwise 50 5 0.2 --allow-extra-chr --double-id \
+        --out variants_pruned
 ```
+
+Marker lists written to variants_pruned.prune.in and variants_pruned.prune.out
+
 
 REWRITE THIS: This command is removing SNPs in linkage using the -–indep-pairwise option. The numbers
 after the option control how plink removes these SNPs. The first number is the window size (in the
@@ -89,27 +100,58 @@ many variants the window will move between analysis). The third number is the r2
 make the pruned file:
 
 ```bash
-/plink --vcf all.vcf \
---extract variants_pruned.prune.in \
---make-bed --out variants_NoLD \
---allow-extra-chr --double-id
+plink --vcf $VCF \
+    --extract variants_pruned.prune.in \
+    --make-bed --out variants_NoLD \
+    --allow-extra-chr --double-id
 ```
 
+--make-bed to variants_NoLD.bed + variants_NoLD.bim + variants_NoLD.fam ...
+done.
+
 run the pca
+
 ```bash
-/plink --bfile variants_NoLD \
---pca --out variants_NoLD_PCA --allow-extra-chr --double-id
+plink --bfile variants_NoLD \
+    --pca --out variants_NoLD_PCA --allow-extra-chr --double-id
 ```
+--pca: Results saved to variants_NoLD_PCA.eigenval and
+variants_NoLD_PCA.eigenvec .
+
+
+cichlids.eigenval - the eigenvalues from our analysis
+cichlids.eigenvec- the eigenvectors from our analysis
+plink binary output
+
+cichlids.bed - the cichlids bed file - this is a binary file necessary for admixture analysis. It is essentially the genotypes of the pruned dataset recoded as 1s and 0s.
+cichlids.bim - a map file (i.e. information file) of the variants contained in the bed file.
+cichlids.fam - a map file for the individuals contained in the bed file.
+
+
 
 
 plot the pca results
+
+!!!! Change plot colors !!!!!!!
+
 ```{r, eval=F}
 
 library(ggplot2)
 
-setwd("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching")
+setwd("~/my_materials/population_structure")
 
 dat <- read.table("variants_NoLD_PCA.eigenvec", header=F)
+eigenval <- read.table("variants_NoLD_PCA.eigenval", header=F)
+
+# first convert to percentage variance explained
+pve <- data.frame(PC = 1:16, pve = eigenval/sum(eigenval)*100)
+# calculate the cumulative sum of the percentage variance explained
+cumsum(pve$pve)
+# make plot
+a <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity")
+a + ylab("Percentage variance explained") + theme_light()
+
+
 
 colnames(dat) <- c("ID", "ID2", "PC1", "PC2", "PC3", "PC4", colnames(dat)[7:ncol(dat)])
 

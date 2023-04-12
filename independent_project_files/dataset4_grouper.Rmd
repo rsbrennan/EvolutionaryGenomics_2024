@@ -1,0 +1,68 @@
+---
+title: "Dataset 4: Grouper"
+output:
+  html_document:
+    theme: flatly
+    #prettydoc::html_pretty:
+    #theme: cayman
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(knitr)
+library(dplyr)
+library(tidyr)  
+```
+
+<br>
+
+# Study System Overview
+
+<br>
+
+This dataset is focused on the [common coral grouper, Plectropomus leopardus ](https://en.wikipedia.org/wiki/Leopard_coral_grouper). This species is found on reefs in the Indo-West Pacific. It is a large species that is heavily fished and, while abundant, this has led to [population declines](http://era.daf.qld.gov.au/id/eprint/7426/). 
+
+The species is particularly common on the Great Barrier Reef where it is one of the primary predatory species. Given this, and its heavy exploitation, understanding population structure is essential for management. P. leopardus is a broadcast spawner where larvae have a 26 day pelagic duration. Conversely, individuals tend to stay on the same reef following settlement. 
+
+The geological history of the Great Barrier Reef region has likely played a role in current population structure of local species. In particular, sea level fluctuations over the past 400,000 years have been common until about 10,000 years ago, after which the region became stable. Thus, most species are relatively recently established. Conversely, The nearby Coral Sea has been stable over this same period. See the map below.
+
+<br>
+
+# Data collection
+
+<br>
+
+In this dataset, [Payet et al.,](https://doi.org/10.1111/eva.13450) sampled populations of the common coral grouper from across the Great Barrier reef and the Coral Sea.
+
+<center>
+![Map of sampling. Blue arrows show currents while the solid black line shows the lowest water level during the last two glacial periods between 190–130 kya and 10–120   kya. Map from [Payet et al.,](https://doi.org/10.1111/eva.13450)](images/dataset_4_map.png){width=400px}
+</center>
+
+
+!!!!! ADD SAMPLE NUMBERS !!!!!!!
+
+<br>
+
+The authors used ddRAD with 150bp paired end reads using an Illumina HiSeq 4000. Because they had no genome, the data were anayzed with Stacks.
+
+<br>
+
+# File information
+
+<br>
+
+The vcf file for this dataset is located: `~/shared_materials/Project_files/dataset_4/dataset4.vcf`
+
+Id and population of each individual: `shared_materials/Project_files/dataset_4/????`
+
+Sampling locations were not provided by the authors... you could roughly estimate these by grabbing latlongs from approximate locations in google maps. This should be good enough for isolation by distance estimates, for example. 
+
+
+
+
+

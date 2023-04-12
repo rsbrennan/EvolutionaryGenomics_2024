@@ -1,0 +1,68 @@
+---
+title: "Independent projects"
+output:
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(knitr)
+library(dplyr)
+library(tidyr)  
+```
+
+<br>
+
+# Overview
+
+<br>
+
+The goal of the independent projects is for you to apply the techniques and methods we covered in the tutorials and make some conclusions about the biology of the system you're working on. 
+
+For each project, you'll have a vcf file and other relevant supporting information. It is your job to analyze these data, draw some conclusions, and present these results to the class in a ~15-20 minute presentation. 3/4 of these datasets are from published papers. Please don't look at the papers for their conclusions, that would defeat the purpose of this exercise.
+
+<br>
+
+# Datasets
+
+<br>
+
+Go the the following pages to get more info about the potential datasets:
+
+1. [Killifish along salinity gradients](./independent_project_files/dataset1_killifish.html)
+2. [Cod migration and population structure](./independent_project_files/dataset2_cod.html)
+3. [Scallop population structure](./independent_project_files/dataset3_scallops.html)
+4. [Grouper population structure and diversity](./independent_project_files/dataset4_grouper.html)
+
+You'll do this project in pairs. With your partner, look through the possible datasets and rank them in order of preference. We'll then have a class discussion to assign datasets. 
+
+All data can be found on cloudlab under `shared_materials`.
+
+<br>
+
+# Some additional advice
+
+Things to consider would be:
+- How many snps are in my data?
+- How much missing data? What is the sequencing depth? Other quality measures.
+- Is there evidence for population structure
+  - PCA, Admixture, Fst estimates, isolation by distance
+- What is the genetic diversity of your populations?
+  - pi, Fis, etc.
+- Is there any evidence for selection?
+  - outflank, Fst scans...
+
+
+
+
+
+
+
+
+

@@ -3,8 +3,6 @@ title: "Tutorials"
 output:
   html_document:
     theme: flatly
-    #prettydoc::html_pretty:
-    #theme: cayman
 ---
 
 1. Two part:
