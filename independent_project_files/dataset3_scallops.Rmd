@@ -2,9 +2,12 @@
 title: "Dataset 3: Scallops"
 date: "`r Sys.Date()`"
 output:
-  prettydoc::html_pretty:
-    theme: cayman
-    highlight: github
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
 ---
 
 ```{r setup, include=FALSE}
@@ -15,6 +18,7 @@ library(dplyr)
 library(tidyr)  
 ```
 
+## Overview
 
 This dataset is focused on the [King scallop, Pecten maximus](https://en.wikipedia.org/wiki/Pecten_maximus). This species is heavily fished and used in aquaculture, so is important from an economic and fishery perspective. As such, there's been a fair amount of work on this species to understand their genetic structure, local adaptation, and so on. There's also a nice, [chromosome level genome assembly](http://dx.doi.org/10.1093/gigascience/giaa037).
 
@@ -22,15 +26,23 @@ As adults, scallops don't move much, but they have a long pelagic larval stage (
 
 In this dataset, [Hollenbeck et al.](https://doi.org/10.1098/rspb.2022.1573), looked at populations spanning the Norwegian Trench and across a fairly large latitudinal gradient. See the map below for sampling locations.  
 
+<br>
+
 <center>
 ![Map of sampling. The red line shows the location of the Norwegian Trench](images/dataset_3_map.png){width=300px}
 </center>
+
+<br>
 
 In this study, the authors know from previous work that there is a population break across the Norwegian Trench. They further hypothesize that there is local adaptation to temperature, particularly in Spain, where temperatures are much warmer and represents the southern edge of the species' distribution.
 
 ddRAD was used to genotype individuals and reads were mapped to the reference genome and SNPs called with freebayes. 
 
+## Sampling locations
+
 Here are the sampling locations and number of individuals from each site.
+
+<br>
 
 | Site                 | Site Code | Latitude | Longitude | N   |
 |----------------------|-----------|----------|-----------|-----|
@@ -43,8 +55,11 @@ Here are the sampling locations and number of individuals from each site.
 | Southern Norway      | SNO       | 60.900   | 4.043     | 20  |
 | North-central Norway | NNO       | 65.241   | 10.195    | 20  |
 
+<br>
 
+## Files
 
+<br>
 
 The vcf file for this dataset is located: `shared_materials/Project_files/dataset_3/`
 

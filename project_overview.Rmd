@@ -49,6 +49,7 @@ All data can be found on cloudlab under `shared_materials`.
 # Some additional advice
 
 Things to consider would be:
+
 - How many snps are in my data?
 - How much missing data? What is the sequencing depth? Other quality measures.
 - Is there evidence for population structure
