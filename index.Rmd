@@ -1,17 +1,19 @@
 ---
-title: "bioc 202: Fundamentals of evolutionary genomics"
+title: "bioc 202: Fundamentals of population genomics"
 output:
   html_document:
     theme: flatly
 ---
 
-#### Dr. Reid Brennan
+#### Reid Brennan
 #### Summer 2023
 #### GEOMAR
 
+<br>
+
 Welcome! This is a master's level course designed to give background and practical experience in population genomics. The goal is that you are able to analyze and interpret population genomic data by the end of the course. This will require gaining some practical skills in bioinformatic methods as well as knowledge of the biology to be able to interpret results.
 
-The course will take place from May 5-19 in room B-106, West Shore. See the [Schedule](https://rsbrennan.github.io/EvolutionaryGenomics_2023/schedule.html) for full details.
+The course will take place 8:30-12:00 from May 5-19 in room B-106, West Shore. See the [Schedule](https://rsbrennan.github.io/EvolutionaryGenomics_2023/schedule.html) for full details.
 
 We will spend the first half of the course learning methods and concepts via hands on tutorials and short lectures. During the second half you will analyze a dataset and present the results at the end of the course.
 

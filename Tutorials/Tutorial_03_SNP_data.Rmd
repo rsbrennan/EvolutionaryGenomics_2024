@@ -73,6 +73,8 @@ cut -f 4- variants_noheader.vcf | paste threecols.txt - | cat header.txt - > all
 
 vcftools --vcf all.vcf --keep indivs.txt --recode --out all_subset
 
+mv all_subset.recode.vcf variants.vcf
+
 ```
 
 <br>

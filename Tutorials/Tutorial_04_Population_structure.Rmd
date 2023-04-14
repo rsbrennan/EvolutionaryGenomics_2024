@@ -31,29 +31,6 @@ output:
 }
 </style>
 
-#<br>
-#
-#<div class = "lecture-box">
-#
-#</div>
-#
-#<br>
-
-#<br>
-#
-#<div class = "text-box">
-#
-#</div>
-#
-#<br>
-
-
-# Assessing population structure
-
-<br>
-
-PCA, Admixture, Fst, isolation by distance.
-
 <br>
 
 <div class = "lecture-box">
@@ -64,12 +41,15 @@ Short lecture on methods to detect population structure.
 
 <br>
 
-
-```{bash eval=FALSE, echo=FALSE}
-
-```
-
 # PCA
+
+One of the most basic and fundamental tools to understand population structure is [principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis), also known as PCA. You can think of PCA as giving us the "big picture" view of our data. 
+
+To goal of PCA is to represent the main axes of variation in a dataset. 
+
+We can first make a new directory where we will analyze our population structure data: 
+
+<br>
 
 ```{bash, eval=FALSE}
 VCF=~/shared_materials/variants.vcf
@@ -79,23 +59,33 @@ cd population_structure
 
 ```
 
+<br>
+
+One important assumption of a PCA is that there is no linkage in our data. In other words, our SNPs need to be independent. We know in most datasets, snps that are close together, or linked due to other causes, are correlated. We need to "prune" for LD. We can use [plink](https://www.cog-genomics.org/plink/) to do this.
+
+Plink is a powerful program that was designed for human genomics. This means that we need to add additional parameters to our commands. 
+
+#### Prune for LD
+
+Run the code below
+
 ```bash
 plink --vcf $VCF \
         --indep-pairwise 50 5 0.2 --allow-extra-chr --double-id \
         --out variants_pruned
 ```
 
-Marker lists written to variants_pruned.prune.in and variants_pruned.prune.out
+Here, we specify our input file with `--vcf`, our output file name with `--out`, and `--allow-extra-chr` and `--double-id` help to deal with our non-human data. 
+
+The real action is happening with the `--indep-pairwise` command. The first value is the window-size, in this case 50 snps. The second number tells us how far to move the window each step (5 SNPs), and the third value tells use the LD threshold to use to remove a SNP (r-squared value). The values we use here are the most commonly used. See [here](https://www.cog-genomics.org/plink/1.9/ld) for more information.
+
+This command will output a two lists:
+
+- `variants_pruned.prune.in`: the set of LD pruned SNPs
+- `variants_pruned.prune.out`: the SNPs removed from the dataset.
 
 
-REWRITE THIS: This command is removing SNPs in linkage using the -–indep-pairwise option. The numbers
-after the option control how plink removes these SNPs. The first number is the window size (in the
-number of variants it investigates). The second number is the frame-shift for the window size (how
-many variants the window will move between analysis). The third number is the r2 cut-off value
-(designating an upper limit for how correlated/in-linkage SNPs in a window are allowed to be). 50
-5 and 0.2 are commonly used values
-
-make the pruned file:
+Now we have a list of the LD pruned snps, we need to make the pruned file that plink needs.
 
 ```bash
 plink --vcf $VCF \
@@ -104,33 +94,38 @@ plink --vcf $VCF \
     --allow-extra-chr --double-id
 ```
 
---make-bed to variants_NoLD.bed + variants_NoLD.bim + variants_NoLD.fam ...
-done.
+Here we tell plink to `extract` from our VCF tile only the LD pruned variants in our `variants_pruned.prune.in` file. 
+We tell it to make a `bed` file and other associated files that are specific to Plink which gives us the following:
 
-run the pca
+- `variants_NoLD.bed`: a binary file that records genotypes in 0 and 1. 
+- `variants_NoLD.bim`: a map file that tells the details of the variants
+- `variants_NoLD.fam`: a fam file that tells us details of the individuals in the dataset.
+
+<br>
+
+#### run the pca
+<br>
+
+Now that we have our LD pruned plink files, we can run our actual PCA, again in plink.
+
+<br>
 
 ```bash
 plink --bfile variants_NoLD \
     --pca --out variants_NoLD_PCA --allow-extra-chr --double-id
 ```
---pca: Results saved to variants_NoLD_PCA.eigenval and
-variants_NoLD_PCA.eigenvec .
+
+Where `--bfile` says to read in the plink files in binary format with our specific name and `pca` is hopefully self explanatory.
 
 
-cichlids.eigenval - the eigenvalues from our analysis
-cichlids.eigenvec- the eigenvectors from our analysis
-plink binary output
+This will ourput two files:
 
-cichlids.bed - the cichlids bed file - this is a binary file necessary for admixture analysis. It is essentially the genotypes of the pruned dataset recoded as 1s and 0s.
-cichlids.bim - a map file (i.e. information file) of the variants contained in the bed file.
-cichlids.fam - a map file for the individuals contained in the bed file.
+- `variants_NoLD_PCA.eigenval`: the variation that is explained by each principal component (PC)
+- `variants_NoLD_PCA.eigenvec`: the principal component values for each sample for each PC
 
 
+#### plot the pca results
 
-
-plot the pca results
-
-!!!! Change plot colors !!!!!!!
 
 ```{r, eval=F}
 
@@ -142,94 +137,124 @@ dat <- read.table("variants_NoLD_PCA.eigenvec", header=F)
 eigenval <- read.table("variants_NoLD_PCA.eigenval", header=F)
 
 # first convert to percentage variance explained
-pve <- data.frame(PC = 1:16, pve = eigenval/sum(eigenval)*100)
+pve <- data.frame(PC=1:20, pve=round(eigenval$V1/sum(eigenval$V1)*100,1))
 # calculate the cumulative sum of the percentage variance explained
 cumsum(pve$pve)
-# make plot
-a <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity")
-a + ylab("Percentage variance explained") + theme_light()
 
+# plot the PC's
+a <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity") + 
+  ylab("Percentage variance explained") + theme_light()
+a
 
+####################
+# plot the PCA
+####################
 
+# rename our columns, just for ease
 colnames(dat) <- c("ID", "ID2", "PC1", "PC2", "PC3", "PC4", colnames(dat)[7:ncol(dat)])
 
+# add a population label:
 dat$population <- substr(dat$ID, 1,2)
 
-d <- ggplot(dat, aes(PC1, PC2, fill=population)) +
-        geom_point(size=4.5, shape=21, color="black") +
-        #xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-        #ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-        theme_bw() +
-        #scale_fill_manual(values=c('steelblue1','steelblue','grey45', "darkorchid2", "firebrick3"),
-  scale_fill_manual(values=c("#D3DDDC",'#6699CC',"#F2AD00","#00A08A", "#CC3333"),
-                    labels = c("Founding population","Ambient", "Acidic", 
-                               "Warming", "Greenhouse"))+
-        #theme(legend.title = element_blank())+
-       # theme(legend.text=element_text(size=8))+
-        #theme(legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'))+
-#        ggtitle("F1")+
-        #fill=c('steelblue1','steelblue','grey45', "darkorchid2", "firebrick3" )),order = 2),
-    fill=c("#D3DDDC",'#6699CC',"#F2AD00","#00A08A", "#CC3333")),order = 2),
-    shape= FALSE)
+# plot the PCA
 
-#ggsave("~/tonsa_genomics/figures/pca_afs_noF3.pdf",d, w=5.5, h=3.7)
+d <- ggplot(dat, aes(PC1, PC2, fill=population)) +
+  geom_point(size=4.5, shape=21, color="black") +
+  xlab(paste0("PC1: ",pve$pve[1],"% variance")) +
+  ylab(paste0("PC2: ",pve$pve[2],"% variance")) +
+  theme_bw() +
+  scale_fill_manual(values=c("#68228B",'#B22222',"#CD6090","#87CEFA", "#1874CD"))
+d
+
+# optional, output your pca to a pdf
+#ggsave("pca.pdf",d, w=5, h=3.7)
 
 ```
 
+# Admixture/STRUCTURE
+
+Another classic, powerful, and likley most popular analysis in population genetics is [STRUCTURE](https://web.stanford.edu/group/pritchardlab/structure.html), which was published in 2000 and since has accumulated >36,000 citations. Structure's is a model based method that infers population structure. The goal is to cluster individuals into hypothetical ancestral populations in a manner that individuals within a population are in Hardy-Weinberg equilibrium and linkage equilibrium. The program is iteratively assigning individuals to populations until it converges on population assignments that have the most likely allele frequency compositions.  
+
+However, STRUCTURE is slow and numerous other methods have been developed that do the same thing in a much faster way. One is [ADMIXTURE](https://dalexander.github.io/admixture/), which we will use here. See the manual [here](https://dalexander.github.io/admixture/admixture-manual.pdf)
 
 
+### Running ADMIXTURE
 
-# Admixture
+Admixture requires LD pruned variants in plink ormat, which we already generated above for our PCA. 
 
-# Fst
+Running admixture is relatively easy and short: 
 
-# Isolation by distance
+```{bash, eval =F}
 
+admixture --cv variants_NoLD.bed 2 | tee log_2.out
 
-add snp ids:
+```
 
-chr1_29988
+Here, we call the program with `admixture`, we use `--cv` to say we want to calculate the cross validation score (we'll get to this later), we specify our bed file, and we tell the programs how many populations to assume. The `|` and `tee` just outputs the stdout to a file that we can save. 
 
-need to get format right. its annoying.
-
-
-
-
-### admixture
-
-short lecture on population structure, Fst, drift.
+I'm sure you remember from lecture, but we need to run this for multiple values of K in order to determine the most likely number of populations. We could just copy the code above for multiple K's, but this can be done more elegantly below:
 
 
 ```{bash, eval=F}
 
-for K in 1 2 3 4 5 6; \
+for K in 1 2 3 4 5; \
 do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
 
 ```
 
+<br>
+
+<div class = "text-box">
+Let's talk about this loop.
+
+How does it work? 
+
+What are sensible values of K to run?
+
+</div>
+
+<br>
+
+
+and we need to grab the cross validation scores, to determine the most likely K:
+
+```{bash, eval=F}
+
+grep -h CV log*.out | cut -f 3- -d " " > cv.txt
+
+```
+
+`grep` is saying to find lines with `CV` in our log files and print them. We then drop the first few columns so it is easier to plot next. 
+
+
+#### plot the ADMIXTURE results
+
 ```{r, eval=F}
+library(tidyverse)
+setwd("~/my_materials/population_structure")
 
-samplelist <- read_tsv("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/indivs_subsample.txt",
-                       col_names = "sample")
+samplelist <- read_tsv("~/shared_materials/indivs.txt",
+                       col_names = "individual")
 
-read_delim("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.2.Q",
+# we could read in one data frame at a time:
+read_delim("~/my_materials/population_structure/variants_NoLD.2.Q",
                   col_names = paste0("Q",seq(1:2)),
                   delim=" ")
 
 
 # read in all date, in a loop
-all_data <- tibble(sample=character(),
+## first create an empty dataframe
+all_data <- tibble(individual=character(),
                    k=numeric(),
                    Q=character(),
                    value=numeric())
 
-head(all_data)
-
+# then add all results to this
 for (k in 1:6){
-  data <- read_delim(paste0("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/variants_NoLD.",k,".Q"),
+  data <- read_delim(paste0("~/my_materials/population_structure/variants_NoLD.",k,".Q"),
                   col_names = paste0("Q",seq(1:k)),
                   delim=" ")
-  data$sample <- samplelist$sample
+  data$sample <- samplelist$individual
   data$k <- k
   #This step converts from wide to long.
   data %>% gather(Q, value, -sample,-k) -> data
@@ -242,7 +267,7 @@ all_data$population <- factor(all_data$population,
                               levels=c("GA", "PL", "HP", "BC", "PC", "TR"))
 
 # our orders are off in our vcf. lets re-order these from south to north. 
-orderlist <- read_tsv("~/Documents/GEOMAR/Teaching/Mar_pop_gen/2023/teaching/population_order.txt",
+orderlist <- read_tsv("~/shared_materials/population_order.txt",
                        col_names = "sample")
 all_data$sample<-factor(all_data$sample,levels=orderlist$sample)
 
@@ -268,11 +293,101 @@ p <-  ggplot(all_data,aes(x=sample,y=value,fill=factor(Q))) +
                     labels=seq(1:5)) +
   facet_wrap(~k,ncol=1)
 
+# ggsave("Admixture_plot.pdf", p, width = 7, height = 15, units="in")
 
+### what is our most likely k?
 
-ggsave("Admixture_plot.pdf", p, width = 7, height = 15, units="in")
+# read in CV scores:
+cvin <- read.csv("cv.txt", sep=":", header=F)
+colnames(cvin) <- c("id", "cv")
+# fix the formatting to get K into numeric format
+cvin$K <- substr(cvin$id, 4, 4)
+
+# plot the results
+ggplot(cvin,aes(x=K,y=cv)) +
+  geom_point(size=3)  + geom_line(group=1)
 
 ```
+
+<br>
+
+<div class = "text-box">
+
+- What is our most likely K? 
+- Now we can talk biology... 
+
+</div>
+
+<br>
+
+
+
+# Fst and isolation by distance
+
+We can also calculate genome-wide Fst to understand how population may be structured. We could do this with vcftools, but we'll use the R package `snpR` instead. Note that if you have a large vcf file, you'll need a lot of memory to run this in R- you'd be better off with vcftools.
+
+
+```{r, eval=F}
+remotes::install_github("hemstrow/snpR", build_vignettes = T) # linux
+library(snpR)
+vignette("snpR_introduction")
+
+setwd("~/my_materials/population_structure")
+
+dat <- read_vcf("~/shared_materials/variants.vcf")
+
+sample_meta <- data.frame(pop = substr(colnames(dat), 1, 2))
+sample_meta$pop <- factor(sample_meta$pop, levels=c("GA", "HP", "BC", "PC", "TR")) 
+
+sample.meta(dat) <- sample_meta
+
+genotypes(dat)[1:6, 1:6]
+
+head(get.snpR.stats(my.dat, facets = "pop", stats = "ho")$weighted.means) #retrieving the results
+
+my.dat <- calc_pairwise_fst(dat, facets="pop", method = "WC")
+
+get.snpR.stats(my.dat, facets = "pop", stats = "fst")
+
+plot_pairwise_fst_heatmap(my.dat, facets="pop")
+```
+
+
+We can also ask if our populations follow isolation by distance. 
+
+```{r, eval=F}
+# isolation by distance
+fst_out <- get.snpR.stats(my.dat, facets = "pop", stats = "fst")$weighted.means
+
+distances <- read.csv("~/shared_materials/distances.csv", header=T)
+
+dist.df <- merge(distances, fst_out, by="subfacet")
+
+p <-  ggplot(dist.df,aes(x=distance,y=weighted_mean_fst)) + 
+  geom_point()
+p
+
+# and we can add the population labels
+p + geom_text(label=dist.df$subfacet)
+
+```
+
+
+
+For example, if we want the pairwise fst between GA and TR, we do the following:
+
+```{r, eval=F}
+
+my.dat <- calc_pi(dat, facets="pop")
+
+fst_out <- get.snpR.stats(my.dat, facets = "pop", stats = "fst")$weighted.means
+
+```
+
+
+<br>
+
+
 
 
 ### fst
@@ -317,49 +432,37 @@ these run decently fast.
 ```{bash, eval=F}
 for pop in TR PC BC HP PL GA;
 do
-  vcftools --vcf all.vcf \
-    --keep ${pop}.pop \
+  vcftools --vcf ~/shared_materials/variants.vcf \
+    --keep ~/shared_materials/${pop}.pop \
     --window-pi 50000 \
     --out ${pop}_pi_50kb;
 done
+
 ```
 
 ```{r, eval=F}
-
+library(tidyverse)
 # read in all in a list
 
-#take all, merge, make ridgeplot for each. 
+HP_pi_50kb.windowed.pi
 
+dir <- "~/my_materials/population_structure"
+files <- file.path(dir, list.files(dir))
+files <- files[grep("windowed.pi", files)]
+files
 
+# read in files
+d <- lapply(files, read.table)
+d <- setNames(d,(str_split_fixed(files, "/", 4)[,4] %>% str_split_fixed( "[_]", 3))[,1])
+
+mdat <- bind_rows(d, .id="id")
+
+ggplot(mdat, aes(x=PI, y=id)) + 
+  geom_density_ridges(quantile_lines=TRUE, quantiles=2) 
 
 ```
 
+!!! note that these values are wrong! We can discuss this.
 
 
 
-## gene environment associations or selection scans.
-
-baypass? bayenv? lfmm? pcadapt is probably easiest. 
-
-
-## gwas
-
-gemma? 
-
-## intersection between the two?
-
-
-# things to do:
-
-consider parsing down to fewer chromosomes
-
-Asmixture runs too slow. drop some samples? 
-
-R libraries:
-ggplot2
-ggridges
-
-drop the funny sample PC-393-024
-Probably drop PL- it is confusing.
-
-fix the error in the vcf header that gets thrown with VCFtools.

@@ -3,8 +3,6 @@ title: "Cloudlab"
 output:
   html_document:
     theme: flatly
-    #prettydoc::html_pretty:
-    #theme: cayman
     highlight: tango
     toc: true
     toc_float: true
@@ -75,16 +73,13 @@ Then you should see the following jupyterlab screen
 Within your environment, there are a few things to keep in mind. 
 
 There are two main places things are stored:
-- `shared_materials`
-- `my_materials`
+
+- `shared_materials`: where the class wide files live- datasets, etc.
+- `my_materials`: where you will save your own files
 
 <br>
 
-`shared_materials` is where the class wide files live- datasets, etc. 
-
-<br>
-
-`my_materials` is where you will save your own files. **any data or files your generate that are not saves in `my_materials` will be deleted when you log out!** 
+**any data or files your generate that are not saves in `my_materials` will be deleted when you log out!** 
 
 <br>
 
