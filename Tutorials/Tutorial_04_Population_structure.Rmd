@@ -4,75 +4,202 @@ title: "Population structure"
 output:
   html_document:
     theme: flatly
+    #prettydoc::html_pretty:
+    #theme: cayman
     highlight: tango
     toc: true
     toc_float: true
     css: ../style.css
 ---
-
-
+  
+  
 <style>
-.text-box {
-  background-color: #d4e9fc;
-  color: black;
-  font-size: 14px;
-  border-radius: 5px; 
-  padding: 20px
-}
+  .text-box {
+    background-color: #d4e9fc;
+      color: black;
+    font-size: 14px;
+    border-radius: 5px; 
+    padding: 20px
+  }
 </style>
-
+  
 <style>
-.lecture-box {
-  background-color: #f7e1fc;
-  color: black;
-  font-size: 14px;
-  border-radius: 5px; 
-  padding: 20px
-}
+  .lecture-box {
+    background-color: #f7e1fc;
+      color: black;
+    font-size: 14px;
+    border-radius: 5px; 
+    padding: 20px
+  }
 </style>
-
+  
 <br>
-
 <div class = "lecture-box">
-
-Short lecture on methods to detect population structure.
+  
+  Short lecture on methods to detect population structure.
 
 </div>
-
+  
 <br>
+  
+# Estimate diversity
 
-# PCA
+It is usually interesting to understand the genetic diversity of your population. This can provide insight into bottlenecks, selection, and so on. 
 
-One of the most basic and fundamental tools to understand population structure is [principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis), also known as PCA. You can think of PCA as giving us the "big picture" view of our data. 
+We will calculate Pi for our populations (remember from lecture..). There are numerous way we could do this, but we will use vcftools. One important thing to note about this method is that it assumes all sites not in our vcf file are invariant. That is, there is an assumption that we have sequenced the whole genome, which is not true in our case. For all methods that estimate pi, it is very important that you know how your vcf is being handled and invariant sites are considered. 
 
-To goal of PCA is to represent the main axes of variation in a dataset. 
+We will use 50kb windows to calculate pi. You could alter this window size and it would change your results. We're using a windowed approach because 1. per site estimates are noisy; 2. We are generally interested in the whole genome pi, which a large window will estimate well; 3. It produces less output so is easier to deal with.
 
 We can first make a new directory where we will analyze our population structure data: 
-
+  
 <br>
-
-```{bash, eval=FALSE}
+  
+  ```{bash, eval=FALSE}
 VCF=~/shared_materials/variants.vcf
 # under /my_materials
-mkdir population_structure
+mkdir diversity
 cd population_structure
+
+```
+
+In the loop below, we will estimate pi for each population.
+
+```{bash, eval=F}
+for pop in TR PC BC HP PL GA;
+do
+
+vcftools --vcf ~/shared_materials/variants.vcf \
+--keep ~/shared_materials/${pop}.pop \
+--window-pi 50000 \
+--out ${pop}_pi_50kb;
+
+done
 
 ```
 
 <br>
 
+This loop is saying, for each of our population id's (`TR PC BC HP PL GA`), do the following. Where we have `${pop}` in the loop, the population id of that step is inserted. First, `TR`, then `PC`, and so on. The `--keep` option is telling vcftools which individuals to keep (specified in a text file), `window-pi` allows us to set the window size and tell vcftools to calculate pi, and the `--out` option is our output filename. 
+
+<br>
+
+<div class="text-box">
+
+Run the loop above. 
+
+Look at your results and we will discuss together.
+
+</div>
+
+<br>
+
+
+#### processing output
+
+We next need to process the output from vcftools. We can do this in R by reading all of our files into R in a list, then plotting the results.
+
+```{r, eval=F}
+library(tidyverse)
+
+# First, get the file locations and names.
+# set the directory where the files are located. 
+dir <- "~/my_materials/population_structure"
+# generate the paths to the files
+files <- file.path(dir, list.files(dir))
+# drop the summary files, we only want the actual pi estimates
+files <- files[grep("windowed.pi", files)]
+# look at your file locations- are they correct?
+files
+
+# read in files
+# lapply lets us apply the same function to all of our files. It will output a list where each item is one of our files.
+d <- lapply(files,
+                  FUN = function(files) {
+                    read.table(files, header = TRUE)
+                  })
+# but the list has no names, so we need to fix this:
+names(d)
+d <- setNames(d,(str_split_fixed(files, "/", 4)[,4] %>% str_split_fixed( "[_]", 3))[,1])
+names(d)
+
+# you can now access each item in the in two ways. 
+## 1: by index
+head(d[[1]])
+
+## 2: by name
+head(d[['BC']])
+
+# However, if you know R at all, having dataframes in different lists isn't super great (especially if we want to use ggplot). So we need to merge them together.
+## we can use the bind_rows function, that will paste the dataframes together by row and add a column that we tell it, in this case id that is based on the name of the dataframes.
+meltdat <- bind_rows(d, .id="id")
+
+# we now have a big dataframe of all of our data.
+
+```
+
+<br>
+
+<div class="text-box">
+
+How would you check that your `bind_rows` function worked correctly and your final dataframe is complete?
+
+</div>
+
+<br>
+
+#### Pi for each population
+
+```{r, eval=F}
+library(ggplot2)
+library(ggridges)
+
+# we can first plot density plots of the estimates
+
+ggplot( meltdat, aes(x=PI, y=id)) + 
+  geom_density_ridges(quantile_lines=TRUE, quantiles=2)
+
+
+# and we can grab means for each
+meltdat %>%
+  group_by(id) %>%
+  summarize(mean = mean(PI), sd = sd(PI))
+
+```
+
+<br>
+
+<div class="text-box">
+
+Do you think there are differences in pi between the populations?  
+
+How might you add more confidence to your conclusion?
+
+</div>
+
+<br>
+
+
+# PCA
+
+One of the most basic and fundamental tools to understand population structure is [principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis), also known as PCA.   
+
+To goal of PCA is to represent the main axes of variation in a dataset. You can think of PCA as giving us the "big picture" view of our data.
+
+
+<br>
+  
 One important assumption of a PCA is that there is no linkage in our data. In other words, our SNPs need to be independent. We know in most datasets, snps that are close together, or linked due to other causes, are correlated. We need to "prune" for LD. We can use [plink](https://www.cog-genomics.org/plink/) to do this.
 
-Plink is a powerful program that was designed for human genomics. This means that we need to add additional parameters to our commands. 
+Plink is a powerful program that was designed for human genomics. This means that is assume our data are fancy and clean and in very specific formats- because of this, we need to add additional parameters to our commands, which you'll see below. 
 
-#### Prune for LD
+### Prune for LD
 
 Run the code below
 
 ```bash
 plink --vcf $VCF \
-        --indep-pairwise 50 5 0.2 --allow-extra-chr --double-id \
-        --out variants_pruned
+--indep-pairwise 50 5 0.2 --allow-extra-chr --double-id \
+--out variants_pruned
 ```
 
 Here, we specify our input file with `--vcf`, our output file name with `--out`, and `--allow-extra-chr` and `--double-id` help to deal with our non-human data. 
@@ -80,8 +207,8 @@ Here, we specify our input file with `--vcf`, our output file name with `--out`,
 The real action is happening with the `--indep-pairwise` command. The first value is the window-size, in this case 50 snps. The second number tells us how far to move the window each step (5 SNPs), and the third value tells use the LD threshold to use to remove a SNP (r-squared value). The values we use here are the most commonly used. See [here](https://www.cog-genomics.org/plink/1.9/ld) for more information.
 
 This command will output a two lists:
-
-- `variants_pruned.prune.in`: the set of LD pruned SNPs
+  
+  - `variants_pruned.prune.in`: the set of LD pruned SNPs
 - `variants_pruned.prune.out`: the SNPs removed from the dataset.
 
 
@@ -89,43 +216,44 @@ Now we have a list of the LD pruned snps, we need to make the pruned file that p
 
 ```bash
 plink --vcf $VCF \
-    --extract variants_pruned.prune.in \
-    --make-bed --out variants_NoLD \
-    --allow-extra-chr --double-id
+--extract variants_pruned.prune.in \
+--make-bed --out variants_NoLD \
+--allow-extra-chr --double-id
 ```
 
 Here we tell plink to `extract` from our VCF tile only the LD pruned variants in our `variants_pruned.prune.in` file. 
 We tell it to make a `bed` file and other associated files that are specific to Plink which gives us the following:
-
+  
 - `variants_NoLD.bed`: a binary file that records genotypes in 0 and 1. 
 - `variants_NoLD.bim`: a map file that tells the details of the variants
 - `variants_NoLD.fam`: a fam file that tells us details of the individuals in the dataset.
 
 <br>
+  
+### run the pca
 
-#### run the pca
 <br>
-
+  
 Now that we have our LD pruned plink files, we can run our actual PCA, again in plink.
 
 <br>
-
+  
 ```bash
 plink --bfile variants_NoLD \
-    --pca --out variants_NoLD_PCA --allow-extra-chr --double-id
+--pca --out variants_NoLD_PCA --allow-extra-chr --double-id
 ```
 
 Where `--bfile` says to read in the plink files in binary format with our specific name and `pca` is hopefully self explanatory.
 
 
 This will ourput two files:
-
-- `variants_NoLD_PCA.eigenval`: the variation that is explained by each principal component (PC)
+  
+- `variants_NoLD_PCA.eigenval`: the variation that is explained by each principal component (PC)  
 - `variants_NoLD_PCA.eigenvec`: the principal component values for each sample for each PC
 
+<br>
 
-#### plot the pca results
-
+### plot the pca
 
 ```{r, eval=F}
 
@@ -138,6 +266,7 @@ eigenval <- read.table("variants_NoLD_PCA.eigenval", header=F)
 
 # first convert to percentage variance explained
 pve <- data.frame(PC=1:20, pve=round(eigenval$V1/sum(eigenval$V1)*100,1))
+
 # calculate the cumulative sum of the percentage variance explained
 cumsum(pve$pve)
 
@@ -145,6 +274,19 @@ cumsum(pve$pve)
 a <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity") + 
   ylab("Percentage variance explained") + theme_light()
 a
+```
+
+<br>
+
+<div class="text-box">
+
+How many PC's do you think we should use with our data?
+
+</div>
+
+<br>
+
+```{r, eval=F}
 
 ####################
 # plot the PCA
@@ -171,9 +313,20 @@ d
 
 ```
 
+
+<br>
+
+<div class="text-box">
+
+Change the code above to plot PC1 and PC3. What do you find and do you think this makes sense?
+
+</div>
+
+<br>
+
 # Admixture/STRUCTURE
 
-Another classic, powerful, and likley most popular analysis in population genetics is [STRUCTURE](https://web.stanford.edu/group/pritchardlab/structure.html), which was published in 2000 and since has accumulated >36,000 citations. Structure's is a model based method that infers population structure. The goal is to cluster individuals into hypothetical ancestral populations in a manner that individuals within a population are in Hardy-Weinberg equilibrium and linkage equilibrium. The program is iteratively assigning individuals to populations until it converges on population assignments that have the most likely allele frequency compositions.  
+Another classic, powerful, and another one of the most popular analysis in population genetics is [STRUCTURE](https://web.stanford.edu/group/pritchardlab/structure.html), which was published in 2000 and since has accumulated >36,000 citations. Structure's is a model based method that infers population structure. The goal is to cluster individuals into hypothetical ancestral populations in a manner that individuals within a population are in Hardy-Weinberg equilibrium and linkage equilibrium. The program is iteratively assigning individuals to populations until it converges on population assignments that have the most likely allele frequency compositions.  
 
 However, STRUCTURE is slow and numerous other methods have been developed that do the same thing in a much faster way. One is [ADMIXTURE](https://dalexander.github.io/admixture/), which we will use here. See the manual [here](https://dalexander.github.io/admixture/admixture-manual.pdf)
 
@@ -193,8 +346,8 @@ admixture --cv variants_NoLD.bed 2 | tee log_2.out
 Here, we call the program with `admixture`, we use `--cv` to say we want to calculate the cross validation score (we'll get to this later), we specify our bed file, and we tell the programs how many populations to assume. The `|` and `tee` just outputs the stdout to a file that we can save. 
 
 I'm sure you remember from lecture, but we need to run this for multiple values of K in order to determine the most likely number of populations. We could just copy the code above for multiple K's, but this can be done more elegantly below:
-
-
+  
+  
 ```{bash, eval=F}
 
 for K in 1 2 3 4 5; \
@@ -203,11 +356,8 @@ do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
 ```
 
 <br>
-
+  
 <div class = "text-box">
-Let's talk about this loop.
-
-How does it work? 
 
 What are sensible values of K to run?
 
@@ -224,8 +374,7 @@ grep -h CV log*.out | cut -f 3- -d " " > cv.txt
 
 ```
 
-`grep` is saying to find lines with `CV` in our log files and print them. We then drop the first few columns so it is easier to plot next. 
-
+`grep` is saying to find lines with `CV` in our log files and print them. We then drop the first few columns so it is easier to plot next. We will come back to these shortly.
 
 #### plot the ADMIXTURE results
 
@@ -271,6 +420,8 @@ orderlist <- read_tsv("~/shared_materials/population_order.txt",
                        col_names = "sample")
 all_data$sample<-factor(all_data$sample,levels=orderlist$sample)
 
+# first, only plot k=2
+
 all_data %>%
   filter(k == 2) %>%
   ggplot(.,aes(x=sample,y=value,fill=factor(Q))) + 
@@ -279,8 +430,23 @@ all_data %>%
   xlab("Sample") + ylab("Ancestry") +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_fill_brewer(palette="Set1",name="K",
-                    labels=c("1","2"))
+  scale_fill_brewer(palette="Set1",name="K",                    
+  labels=c("1","2"))
+```
+
+<br>
+  
+<div class = "text-box">
+
+Stop, and we will discuss this result
+
+
+</div>
+
+<br>
+
+
+```{r, eval=F}
 
 # plot all k values.
 p <-  ggplot(all_data,aes(x=sample,y=value,fill=factor(Q))) + 
@@ -314,11 +480,12 @@ ggplot(cvin,aes(x=K,y=cv)) +
 <div class = "text-box">
 
 - What is our most likely K? 
-- Now we can talk biology... 
+- Now we can talk biology... does any of this make sense?
 
 </div>
 
 <br>
+
 
 
 
@@ -328,9 +495,7 @@ We can also calculate genome-wide Fst to understand how population may be struct
 
 
 ```{r, eval=F}
-remotes::install_github("hemstrow/snpR", build_vignettes = T) # linux
 library(snpR)
-vignette("snpR_introduction")
 
 setwd("~/my_materials/population_structure")
 
@@ -346,11 +511,25 @@ genotypes(dat)[1:6, 1:6]
 head(get.snpR.stats(my.dat, facets = "pop", stats = "ho")$weighted.means) #retrieving the results
 
 my.dat <- calc_pairwise_fst(dat, facets="pop", method = "WC")
+```
 
-get.snpR.stats(my.dat, facets = "pop", stats = "fst")
+Now that we've estimated Fst, we can look at our results:
+
+```{r, eval=F}
+#head(get.snpR.stats(my.dat, facets = "pop", stats = "fst"))
 
 plot_pairwise_fst_heatmap(my.dat, facets="pop")
 ```
+
+<br>
+
+<div class = "text-box">
+
+Again, does this make sense biologically?
+
+</div>
+
+<br>
 
 
 We can also ask if our populations follow isolation by distance. 
@@ -359,6 +538,7 @@ We can also ask if our populations follow isolation by distance.
 # isolation by distance
 fst_out <- get.snpR.stats(my.dat, facets = "pop", stats = "fst")$weighted.means
 
+# I have pre-calculated the ditances between the populations, found in the following file.
 distances <- read.csv("~/shared_materials/distances.csv", header=T)
 
 dist.df <- merge(distances, fst_out, by="subfacet")
@@ -373,96 +553,13 @@ p + geom_text(label=dist.df$subfacet)
 ```
 
 
-
-For example, if we want the pairwise fst between GA and TR, we do the following:
-
-```{r, eval=F}
-
-my.dat <- calc_pi(dat, facets="pop")
-
-fst_out <- get.snpR.stats(my.dat, facets = "pop", stats = "fst")$weighted.means
-
-```
-
-
 <br>
 
+<div class = "text-box">
 
+I hope you'll see that these results look a little funny. Can you explain what is going on here?
 
+</div>
 
-### fst
-
-can do big windows, then selection scan?
-
-
-https://owensgl.github.io/biol525D/Topic_8-9/fst.html
-
-```bash
-
-vcftools --gzvcf all.vcf \
---weir-fst-pop TR.pop \
---weir-fst-pop GA.pop \
---fst-window-size 25000 --out TR_GA_25kb
-
-```
-
-plot the pairwise fst density plots
-
-```{r, class.source = 'fold-hide', eval=F}
-
-# read in all in a list
-
-take all, merge, make ridgeplot for each.
-a
-a
-a
-a
-a
-
-
-```
-
-plot correlation plots
-
-### diversity
-
-these run decently fast. 
-
-
-```{bash, eval=F}
-for pop in TR PC BC HP PL GA;
-do
-  vcftools --vcf ~/shared_materials/variants.vcf \
-    --keep ~/shared_materials/${pop}.pop \
-    --window-pi 50000 \
-    --out ${pop}_pi_50kb;
-done
-
-```
-
-```{r, eval=F}
-library(tidyverse)
-# read in all in a list
-
-HP_pi_50kb.windowed.pi
-
-dir <- "~/my_materials/population_structure"
-files <- file.path(dir, list.files(dir))
-files <- files[grep("windowed.pi", files)]
-files
-
-# read in files
-d <- lapply(files, read.table)
-d <- setNames(d,(str_split_fixed(files, "/", 4)[,4] %>% str_split_fixed( "[_]", 3))[,1])
-
-mdat <- bind_rows(d, .id="id")
-
-ggplot(mdat, aes(x=PI, y=id)) + 
-  geom_density_ridges(quantile_lines=TRUE, quantiles=2) 
-
-```
-
-!!! note that these values are wrong! We can discuss this.
-
-
-
+<br>
+  
