@@ -626,7 +626,7 @@ Knowing how to change your $PATH to include custom directories can be necessary 
 
 ## 27: Matching lines in files with grep [U27] ##
 
-Open the launcher tab and make a new textfile to add the following lines to your file:
+Open the launcher tab and make a new textfile (i.e., click the text file button to open a new window) to paste the following lines to your file:
 
 
     Now is the winter of our discontent.
