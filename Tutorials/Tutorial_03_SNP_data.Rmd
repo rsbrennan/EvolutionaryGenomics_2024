@@ -38,7 +38,7 @@ output:
 
 <br>
 
-Once we have our aligned reads that we're happy with, we need to identify variants. There are lots of ways to do this and we're not actually going to do any of them. It is fairly slow and you don't gain a lot from waiting for things to run. Instead, I already called variants with FreeBayes. We could have also used bcftools, GATK, Angsd, etc etc. 
+Once we have our aligned reads that we're happy with, we need to identify variants. There are lots of ways to do this. However, we're not actually going to do any of them. It is fairly slow and you don't gain a lot from waiting for things to run. Instead, I already called variants with [FreeBayes](https://github.com/freebayes/freebayes). We could have also used bcftools, GATK, Angsd, etc etc. 
 
 What all of these methods are doing similarly is looking for locations in the genome where there is variation. For example, one individual has a genotype of `A/G`, the other `A/A`. 
 
@@ -81,7 +81,7 @@ mv all_subset.recode.vcf variants.vcf
 
 For most variant callling software, the output is VCF. In our case, we're only looking at SNPs, but we could also have insertions or deletions (indels). There are a number of tools we can use to work with VCF files. The most common are [VCFtools](https://vcftools.github.io/man_latest.html) and [BCFtools](https://samtools.github.io/bcftools/bcftools.html). BCFtools is a bit faster, but these two tools do basically the same things. We'll be using vcftools. You can run this by simply typing `vcftools` in the terminal.
 
-Our vcf file is `~/shared_materials/variants.vcf`. This is just a text file. 
+Our vcf file is `~/shared_materials/tutorial_files/variants.vcf`. 
 
 <br>
 
@@ -110,10 +110,10 @@ The header contains a ton of information. Mostly, these are the definitions of t
 3. 	`ID`	The SNP id, many times just the CHR and POS with a `:` delimiter. Human genomes have more formal naming.
 4. `REF`	The base in the reference genome (or bases in the case of an indel). i.e., A,C,G,T.
 5. 	`ALT`	The SNP base. The A,C,G,T that doesn't match the reference.
-6	`QUAL`	A quality score associated with the variant. How confident are we that this is a real variant?
-7	`FILTER`	A flag indicating if the variant has failed or PASS if all the filters were passed successfully.
-8	`INFO`    A list of information about each site. These are defined in the header.
-9	`FORMAT`	The format of the genotype field for each sample. Also defined in the header.
+6.	`QUAL`	A quality score associated with the variant. How confident are we that this is a real variant?
+7.	`FILTER`	A flag indicating if the variant has failed or PASS if all the filters were passed successfully.
+8.	`INFO`    A list of information about each site. These are defined in the header.
+9.	`FORMAT`	The format of the genotype field for each sample. Also defined in the header.
 
 Each following column is an individual genotype. 
 
@@ -143,8 +143,8 @@ Filtering is hard and arbitrary. Generally, you need to consider the following:
 
 - missingness: how many samples are missing data at a site? Do any individuals have a large amount of missing data?
 - Quality: genotypes that have low quality are probably not real. You should drop these.
-- Minor allele frequency: 
-- Depth: This one is hard. There are newer methods that can use very low quality data to infer genotypes, primarily [Angsd](http://www.popgen.dk/angsd/index.php/ANGSD). For typical RADseq, you usually want some minimum (~10x?) and some maximum. Minimums make genotype calls more accurate and maximum removes sites that are likely multi-mapping or similar.
+- Minor allele frequency: Very rare variants are also prone to be errors or simply not informative.
+- Depth: This one is hard. There are newer methods that can use very low quality data to infer genotypes, primarily [Angsd](http://www.popgen.dk/angsd/index.php/ANGSD). Typicaly for RADseq, you usually want some minimum (~10x?) and some maximum. Minimums make genotype calls more accurate and maximum removes sites that are likely multi-mapping or similar.
 
 Let's now look at a few quality controls in our vcf file.
 
@@ -163,7 +163,7 @@ Our vcf file is in the the shared folder, which you cannot write to. We can do a
 
 
 ```{bash, eval=FALSE}
-VCF=~/shared_materials/variants.vcf
+VCF=~/shared_materials/tutorial_files/variants.vcf
 OUT=~/my_materials/filtering/variants
 
 ```
@@ -229,11 +229,11 @@ We will plot these results in R using ggplot2. One lesson in genomics is to make
 
 As a reminder, we have the following files to look at:
 
-mean depth per individual: `variants.idepth`
-mean depth per site: `variants.ldepth.mean`
-Missingness per individual: `variants.imiss`
-Missingness per site: `variants.lmiss`
-Site quality: `variants.lqual`
+- mean depth per individual: `variants.idepth`  
+- mean depth per site: `variants.ldepth.mean`  
+- Missingness per individual: `variants.imiss`  
+- Missingness per site: `variants.lmiss`  
+- Site quality: `variants.lqual`  
 
 For all of the following, you need to use tidyverse.
 
@@ -248,23 +248,29 @@ library(tidyverse)
 
 ### variant depth
 
-number of reads that have mapped to the position. Output is the mean across all individuals. We also see the variance.
+Here we're calculating the number of reads that have mapped to the position.
+
+The output is the mean and variance across all individuals. 
 
 ```{r, eval=F}
+
+# read in the data
 variant_depth <- read_delim("~/my_materials/filtering/variants.ldepth.mean", delim = "\t",
                             col_names = c("chr", "pos", "mean_depth", "variance_depth"), skip = 1)
 
+# plot with ggplot
 p <- ggplot(variant_depth, aes(mean_depth)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
   theme_classic()
 p 
 
+# use summary to summarize the output
 summary(variant_depth$mean_depth)
 
 ```
 
 ### variant missingness
 
-Prop of missing data for each variant
+Next, we look at the proportion of missing data for each variant.
 
 ```{r, eval=F}
 variant_miss <- read_delim("~/my_materials/filtering/variants.lmiss", delim = "\t",
@@ -290,6 +296,9 @@ p <- ggplot(indiv_depth, aes(depth)) + geom_histogram(fill = "dodgerblue1", colo
         theme_classic()
 p 
 
+summary(indiv_depth$depth)
+
+
 ```
 
 ### Individual missing data
@@ -301,7 +310,7 @@ p <- ggplot(indiv_miss, aes(fmiss)) + geom_histogram(fill = "dodgerblue1", colou
         theme_classic()
 p 
 
-
+summary(indiv_miss$fmiss)
 ```
 
 ## Filtering VCF
@@ -309,6 +318,8 @@ p
 If we saw issues above, we could add additional filters to our data. You can do this in vcftools. It woud look something like this where you would replace $NUM with your threshold. You also need to add `recode` when writing a new vcf file. And you choose the name of your filtered vcf with the `--out` variable.
 
 See the vcftools manual for more info.
+
+If we have time, do some additional filtering and check how your results above change.
 
 ```{bash, eval=F}
 vcftools --vcf $VCF \

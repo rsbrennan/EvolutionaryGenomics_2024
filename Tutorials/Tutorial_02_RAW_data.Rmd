@@ -45,11 +45,17 @@ library(tidyr)
 
 When the data comes back from the sequencer, it is one giant text file in fastq format that includes all data from your lane of sequencing. Remember about barcodes- we can use these to demultiplex our data (or really the sequencing center will do it for you, depending on your data type). 
 
-In general, you'll take some fairly consistent steps, with a lot of options, to process your data so you can get to the point of calling snps. These are: quality control, cleaning, and mapping.
+In general, you'll take some fairly consistent steps, with a lot of options, to process your data so you can get to the point of calling snps. These are: 
+
+- quality control
+- cleaning
+- mapping
 
 ## Looking at raw data
 
-For our purposes will use just one sample to learn about data processing. This is sample, `TR-023`, which is  randomly chosen. After demultiplexing, we have two files associated with this sample: `TR-023_RA.fastq.gz` and `TR-023_RB.fastq.gz`
+You can find the data for the tutorial in the directory `~/shared_materials/tutorial_files`
+
+For our purposes will use just one sample to learn about data processing. This is sample, `TR-023`, which is randomly chosen. After demultiplexing, we have two files associated with this sample: `TR-023_RA.fastq.gz` and `TR-023_RB.fastq.gz`
 
 
 <div class="text-box">
@@ -117,15 +123,32 @@ Use `zcat`, `|`, and `wc -l` to count the number of reads in your fastq files.
 
 ## check quality
 
+We first need to make a directory to hold the output from these quality control steps.
+
+<br>
+
+<div class="text-box">
+- In `my_materials`, make a directory called `quality_control`.
+</div>
+
+<br>
+
 We will use [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to check the quality of our sequencing. Briefly, this program scans our fastq files and checks for quality, contamination from adapters, and sequence bias, among others. 
 
 Look at the help page of fastqc using `fastqc --help`
 
 We can then run fastqc for our forward read: 
 
+
 ```bash
-fastqc shared_materials/TR-023_RA.fastq.gz -o .
+
+# move to your quality_control directory before running this code
+
+fastqc ~/shared_materials/tutorial_files/TR-023_RA.fastq.gz -o .
 ```
+
+You can look at the results of this program by opening (double clicking) the html file in the browswer in cloudlab.
+
 <br>
 
 <div class="text-box">
@@ -143,10 +166,20 @@ We will use [Trim Galore](https://www.bioinformatics.babraham.ac.uk/projects/tri
 
 Below is the code to run this program. Again, you can get help using `trim_galore --help`
 
+The options that are relevant here are:
+
+- `--paired`: Telling Trim Galore our data is paired
+- Our files as input
+- `-q 30`: quality threshold for trimming. Commonly 20 or 30 where  Q = -10log10(e). so Q20 is 99% probabilty of a correct call and Q30 is 99.9%.
+- `--length 30`:Length at which to toss out short reads
+- `--stringency 4`: the overlap required for an adapter to be considered a match.
+
+Run trim galore on your data.
+
 ```{bash, eval=F}
 trim_galore --paired \
-      shared_materials/TR-023_RA.fastq.gz \
-      shared_materials/TR-023_RB.fastq.gz \
+      ~/shared_materials/tutorial_files/TR-023_RA.fastq.gz \
+      ~/shared_materials/tutorial_files/TR-023_RB.fastq.gz \
       -q 30 --length 30 --stringency 4
 ```
 
@@ -157,7 +190,7 @@ trim_galore --paired \
 After trim_galore finishes, run fastqc on your newly trimmed data. 
 
 - What has changed? Anything? 
-- Change the stringency, quality, or length threshold in your trim_galore command. How has this affected your results?
+- Change the stringency, quality, or length threshold in your trim_galore command and re-run the trimming and fastqc. How has this affected your results?
 
 </div>
 
@@ -270,10 +303,6 @@ The easiest way to look at how well our mapping worked is to use `samtools flags
 
 <div class = "lecture-box">
 Short lecture/discussion on these results
-
-https://www.molecularecologist.com/2016/08/25/the-trouble-with-pcr-duplicates/
-
-https://hbctraining.github.io/Intro-to-rnaseq-hpc-O2/lessons/04_alignment_quality.html
 
 </div>
 

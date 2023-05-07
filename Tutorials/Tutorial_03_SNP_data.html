@@ -1641,11 +1641,11 @@ div.tocify {
 <h1>Call snps</h1>
 <p><br></p>
 <p>Once we have our aligned reads that we’re happy with, we need to
-identify variants. There are lots of ways to do this and we’re not
+identify variants. There are lots of ways to do this. However, we’re not
 actually going to do any of them. It is fairly slow and you don’t gain a
 lot from waiting for things to run. Instead, I already called variants
-with FreeBayes. We could have also used bcftools, GATK, Angsd, etc
-etc.</p>
+with <a href="https://github.com/freebayes/freebayes">FreeBayes</a>. We
+could have also used bcftools, GATK, Angsd, etc etc.</p>
 <p>What all of these methods are doing similarly is looking for
 locations in the genome where there is variation. For example, one
 individual has a genotype of <code>A/G</code>, the other
@@ -1666,8 +1666,8 @@ VCF files. The most common are <a href="https://vcftools.github.io/man_latest.ht
 BCFtools is a bit faster, but these two tools do basically the same
 things. We’ll be using vcftools. You can run this by simply typing
 <code>vcftools</code> in the terminal.</p>
-<p>Our vcf file is <code>~/shared_materials/variants.vcf</code>. This is
-just a text file.</p>
+<p>Our vcf file is
+<code>~/shared_materials/tutorial_files/variants.vcf</code>.</p>
 <p><br></p>
 <div class="text-box">
 <ol style="list-style-type: decimal">
@@ -1699,13 +1699,15 @@ sequence.</li>
 <li><code>REF</code> The base in the reference genome (or bases in the
 case of an indel). i.e., A,C,G,T.</li>
 <li><code>ALT</code> The SNP base. The A,C,G,T that doesn’t match the
-reference. 6 <code>QUAL</code> A quality score associated with the
-variant. How confident are we that this is a real variant? 7
-<code>FILTER</code> A flag indicating if the variant has failed or PASS
-if all the filters were passed successfully. 8 <code>INFO</code> A list
-of information about each site. These are defined in the header. 9
-<code>FORMAT</code> The format of the genotype field for each sample.
-Also defined in the header.</li>
+reference.</li>
+<li><code>QUAL</code> A quality score associated with the variant. How
+confident are we that this is a real variant?</li>
+<li><code>FILTER</code> A flag indicating if the variant has failed or
+PASS if all the filters were passed successfully.</li>
+<li><code>INFO</code> A list of information about each site. These are
+defined in the header.</li>
+<li><code>FORMAT</code> The format of the genotype field for each
+sample. Also defined in the header.</li>
 </ol>
 <p>Each following column is an individual genotype.</p>
 <p><br></p>
@@ -1730,12 +1732,13 @@ following:</p>
 individuals have a large amount of missing data?</li>
 <li>Quality: genotypes that have low quality are probably not real. You
 should drop these.</li>
-<li>Minor allele frequency:</li>
+<li>Minor allele frequency: Very rare variants are also prone to be
+errors or simply not informative.</li>
 <li>Depth: This one is hard. There are newer methods that can use very
-low quality data to infer genotypes, primarily <a href="http://www.popgen.dk/angsd/index.php/ANGSD">Angsd</a>. For typical
-RADseq, you usually want some minimum (~10x?) and some maximum. Minimums
-make genotype calls more accurate and maximum removes sites that are
-likely multi-mapping or similar.</li>
+low quality data to infer genotypes, primarily <a href="http://www.popgen.dk/angsd/index.php/ANGSD">Angsd</a>. Typicaly
+for RADseq, you usually want some minimum (~10x?) and some maximum.
+Minimums make genotype calls more accurate and maximum removes sites
+that are likely multi-mapping or similar.</li>
 </ul>
 <p>Let’s now look at a few quality controls in our vcf file.</p>
 <p>Note that I relied on a few existing tutorials to help build this
@@ -1752,7 +1755,7 @@ We can do a few things to let you type less.</p>
 have to worry about what directory we’re in when running vcftools- the
 output will be saved to the correct location.</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">VCF</span><span class="op">=</span>~/shared_materials/variants.vcf</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">VCF</span><span class="op">=</span>~/shared_materials/tutorial_files/variants.vcf</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">OUT</span><span class="op">=</span>~/my_materials/filtering/variants</span></code></pre></div>
 <p>You can then call these variables by entering <code>$VCF</code> or
 <code>$OUT</code></p>
@@ -1799,11 +1802,17 @@ is to make a million plots and look at your data in many ways. We want
 to make sure nothing weird is going on. So we plot everything and think
 about if these plots make sense.</p>
 <p>As a reminder, we have the following files to look at:</p>
-<p>mean depth per individual: <code>variants.idepth</code> mean depth
-per site: <code>variants.ldepth.mean</code> Missingness per individual:
-<code>variants.imiss</code> Missingness per site:
-<code>variants.lmiss</code> Site quality:
-<code>variants.lqual</code></p>
+<ul>
+<li>mean depth per individual: <code>variants.idepth</code><br />
+</li>
+<li>mean depth per site: <code>variants.ldepth.mean</code><br />
+</li>
+<li>Missingness per individual: <code>variants.imiss</code><br />
+</li>
+<li>Missingness per site: <code>variants.lmiss</code><br />
+</li>
+<li>Site quality: <code>variants.lqual</code></li>
+</ul>
 <p>For all of the following, you need to use tidyverse.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load tidyverse package</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
@@ -1812,20 +1821,24 @@ per site: <code>variants.ldepth.mean</code> Missingness per individual:
 <h2>variant statistics</h2>
 <div id="variant-depth" class="section level3">
 <h3>variant depth</h3>
-<p>number of reads that have mapped to the position. Output is the mean
-across all individuals. We also see the variance.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>variant_depth <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.ldepth.mean&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;pos&quot;</span>, <span class="st">&quot;mean_depth&quot;</span>, <span class="st">&quot;variance_depth&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_depth, <span class="fu">aes</span>(mean_depth)) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>p </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_depth<span class="sc">$</span>mean_depth)</span></code></pre></div>
+<p>Here we’re calculating the number of reads that have mapped to the
+position.</p>
+<p>The output is the mean and variance across all individuals.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the data</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>variant_depth <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.ldepth.mean&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;pos&quot;</span>, <span class="st">&quot;mean_depth&quot;</span>, <span class="st">&quot;variance_depth&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot with ggplot</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_depth, <span class="fu">aes</span>(mean_depth)) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># use summary to summarize the output</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_depth<span class="sc">$</span>mean_depth)</span></code></pre></div>
 </div>
 <div id="variant-missingness" class="section level3">
 <h3>variant missingness</h3>
-<p>Prop of missing data for each variant</p>
+<p>Next, we look at the proportion of missing data for each variant.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>variant_miss <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.lmiss&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;pos&quot;</span>, <span class="st">&quot;nchr&quot;</span>, <span class="st">&quot;nfiltered&quot;</span>, <span class="st">&quot;nmiss&quot;</span>, <span class="st">&quot;fmiss&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1845,7 +1858,9 @@ across all individuals. We also see the variance.</p>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_depth, <span class="fu">aes</span>(depth)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>p </span></code></pre></div>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(indiv_depth<span class="sc">$</span>depth)</span></code></pre></div>
 </div>
 <div id="individual-missing-data" class="section level3">
 <h3>Individual missing data</h3>
@@ -1853,7 +1868,9 @@ across all individuals. We also see the variance.</p>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;ind&quot;</span>, <span class="st">&quot;ndata&quot;</span>, <span class="st">&quot;nfiltered&quot;</span>, <span class="st">&quot;nmiss&quot;</span>, <span class="st">&quot;fmiss&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_miss, <span class="fu">aes</span>(fmiss)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>p </span></code></pre></div>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(indiv_miss<span class="sc">$</span>fmiss)</span></code></pre></div>
 </div>
 </div>
 <div id="filtering-vcf" class="section level2">
@@ -1864,6 +1881,8 @@ would replace $NUM with your threshold. You also need to add
 <code>recode</code> when writing a new vcf file. And you choose the name
 of your filtered vcf with the <code>--out</code> variable.</p>
 <p>See the vcftools manual for more info.</p>
+<p>If we have time, do some additional filtering and check how your
+results above change.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="dt">\</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--max-missing</span> <span class="va">$NUM</span> <span class="dt">\</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--min-meanDP</span> <span class="va">$NUM</span> <span class="dt">\</span></span>
