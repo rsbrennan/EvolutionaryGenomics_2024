@@ -148,7 +148,8 @@ Filtering is hard and arbitrary. Generally, you need to consider the following:
 
 Let's now look at a few quality controls in our vcf file.
 
-Note that I relied on a few existing tutorials to help build this exercise:
+Note that I relied on a few existing tutorials to help build this exercise:  
+
 - https://speciationgenomics.github.io/filtering_vcfs/
 - https://www.ddocent.com/filtering/ 
 
@@ -158,7 +159,7 @@ Our vcf file is in the the shared folder, which you cannot write to. We can do a
 
 <div class = "text-box">
 
-1. make a new directory in your home directory called `filtering` in the `my_materials` directory
+1. make a new directory in called `filtering` in the `my_materials` directory
 2. set some variables that we can refer to below. This means we won't have to worry about what directory we're in when running vcftools- the output will be saved to the correct location.
 
 
@@ -182,12 +183,16 @@ You can then call these variables by entering `$VCF` or `$OUT`
 
 Your vcf file is relatively small. You can see the file size using `ls -lh`. It is not uncommon to have a vcf file that is many GB in size.
 
-You can count up the actual variants to get a better idea of your data quality. You should have a pretty good idea how you might do this. Hint, you'll need to use `grep -v` to ignore the header, and `wc -l ` to count. Do this now.
+You can count up the actual variants. You should have a pretty good idea how you might do this. Hint, you'll need to ignore the header, and count lines, with pipes involved. 
+
+Do this now.
 
 
 </div>
 
 <br>
+
+Next we will calcluate various statistics for our vcf file. 
 
 
 ### mean depth per individual
@@ -197,7 +202,7 @@ vcftools --vcf $VCF --depth --out $OUT
 
 ```
 
-This outputs the file: `variants.idepth`
+Output file: `variants.idepth`
 
 ### mean depth per site
 
@@ -206,14 +211,14 @@ vcftools --vcf $VCF --site-mean-depth --out $OUT
 
 ```
 
-file: `variants.ldepth.mean`
+Output file: `variants.ldepth.mean`
 
 ### missingness per individual
 
 ``` {bash, eval=FALSE}
 vcftools --vcf $VCF --missing-indv --out $OUT
 ```
-file: `variants.imiss`
+Output file: `variants.imiss`
 
 ### missingness per site
 
@@ -221,7 +226,7 @@ file: `variants.imiss`
 vcftools --vcf $VCF --missing-site --out $OUT
 ```
 
-file: `variants.lmiss`
+Output file: `variants.lmiss`
 
 ## analyze these data in R
 
@@ -244,7 +249,15 @@ library(tidyverse)
 
 ```
 
+
+<br>
+<br>
+
 ## variant statistics
+
+First, we will look at the statistics for each variant. 
+
+<br>
 
 ### variant depth
 
@@ -284,7 +297,12 @@ summary(variant_miss$fmiss)
 
 ```
 
+<br>
+<br>
+
 ## individual statistics
+
+Next we can summarize the results by individual.
 
 ### Individual mean depth
 ```{r, eval=F}
@@ -319,8 +337,6 @@ If we saw issues above, we could add additional filters to our data. You can do 
 
 See the vcftools manual for more info.
 
-If we have time, do some additional filtering and check how your results above change.
-
 ```{bash, eval=F}
 vcftools --vcf $VCF \
     --max-missing $NUM \
@@ -328,8 +344,21 @@ vcftools --vcf $VCF \
     --max-meanDP $NUM \
     --minDP $NUM \
     --maxDP $NUM \
+    --maf $NUM \
     --recode \
     --out filtered_vcf
 
 ```
 
+
+<br>
+
+<div class = "text-box">
+
+Change a few parameters and see how this influences the number of SNPs you have.
+
+Which parameters do you think are most important?
+
+</div>
+
+<br>

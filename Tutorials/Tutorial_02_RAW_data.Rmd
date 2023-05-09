@@ -343,7 +343,7 @@ You can filter by quality by adding a `-q ##` option. A score of 20 is a common 
 We can look at the mapping quality overall:
 
 ```
-samtools view TR-023.bam | cut -f 5 > mapq.txt
+samtools view TR-023.bam | cut -f 5 > ~/my_materials/quality_control/mapq.txt
 ```
 
 - Plot a histogram of these mapping qualities in R (hint, just use `hist()`).

@@ -56,8 +56,10 @@ We can first make a new directory where we will analyze our population structure
   
   ```{bash, eval=FALSE}
 VCF=~/shared_materials/variants.vcf
-# under /my_materials
+
+# under ~/my_materials
 mkdir diversity
+
 cd population_structure
 
 ```
@@ -173,6 +175,8 @@ meltdat %>%
 Do you think there are differences in pi between the populations?  
 
 How might you add more confidence to your conclusion?
+
+What effect do you think window size has on your estimates? Go back and change this value to see what happens.
 
 </div>
 
@@ -376,7 +380,8 @@ grep -h CV log*.out | cut -f 3- -d " " > cv.txt
 
 `grep` is saying to find lines with `CV` in our log files and print them. We then drop the first few columns so it is easier to plot next. We will come back to these shortly.
 
-#### plot the ADMIXTURE results
+<br>
+### plot the ADMIXTURE results
 
 ```{r, eval=F}
 library(tidyverse)
