@@ -60,14 +60,14 @@ VCF=~/shared_materials/tutorial_files/variants.vcf
 # under ~/my_materials
 mkdir diversity
 
-cd population_structure
+cd diversity
 
 ```
 
 In the loop below, we will estimate pi for each population.
 
 ```{bash, eval=F}
-for pop in TR PC BC HP PL GA;
+for pop in TR PC BC HP GA;
 do
 
 vcftools --vcf $VCF \
@@ -514,16 +514,20 @@ We can also calculate genome-wide Fst to understand how population may be struct
 ```{r, eval=F}
 library(snpR)
 
+# read in data file:
 dat <- read_vcf("~/shared_materials/tutorial_files/variants.vcf")
 
+# add meta data information:
+## population
 sample_meta <- data.frame(pop = substr(colnames(dat), 1, 2))
+## order the population
 sample_meta$pop <- factor(sample_meta$pop, levels=c("GA", "HP", "BC", "PC", "TR")) 
 
+# assign meta data to dat
 sample.meta(dat) <- sample_meta
 
+# what does the actual data look like?
 genotypes(dat)[1:6, 1:6]
-
-head(get.snpR.stats(my.dat, facets = "pop", stats = "ho")$weighted.means) #retrieving the results
 
 # calculate fst between the populations
 my.dat <- calc_pairwise_fst(dat, facets="pop", method = "WC")
@@ -532,9 +536,10 @@ my.dat <- calc_pairwise_fst(dat, facets="pop", method = "WC")
 Now that we've estimated Fst, we can look at our results:
 
 ```{r, eval=F}
-
+# first look at the results, just the head
 head(get.snpR.stats(my.dat, facets = "pop", stats = "fst"))
 
+# heatmap of the fst estimates:
 plot_pairwise_fst_heatmap(my.dat, facets="pop")
 ```
 
@@ -552,15 +557,15 @@ Again, does this make sense biologically?
 We can also ask if our populations follow isolation by distance. 
 
 ```{r, eval=F}
-head(get.snpR.stats(my.dat, facets = "pop", stats = "fst"))
-plot_pairwise_fst_heatmap(my.dat, facets="pop")
 
-# isolation by distance
+# pull out the fst estimates first:
 fst_out <- get.snpR.stats(my.dat, facets = "pop", stats = "fst")$weighted.means
 
 # I have pre-calculated the ditances between the populations, found in the following file.
 distances <- read.csv("~/shared_materials/tutorial_files/distances.csv", header=T)
+## the distances are in km
 
+# merge our dataframes:
 dist.df <- merge(distances, fst_out, by="subfacet")
 
 p <-  ggplot(dist.df,aes(x=distance,y=weighted_mean_fst)) + 

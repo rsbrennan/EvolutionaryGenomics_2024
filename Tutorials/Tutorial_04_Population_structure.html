@@ -1667,9 +1667,9 @@ population structure data:</p>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># under ~/my_materials</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> diversity</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> population_structure</span></code></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> diversity</span></code></pre></div>
 <p>In the loop below, we will estimate pi for each population.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> pop <span class="kw">in</span> TR PC BC HP PL GA<span class="kw">;</span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> pop <span class="kw">in</span> TR PC BC HP GA<span class="kw">;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="dt">\</span></span>
@@ -2055,50 +2055,55 @@ file, you’ll need a lot of memory to run this in R- you’d be better off
 with vcftools.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(snpR)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_vcf</span>(<span class="st">&quot;~/shared_materials/tutorial_files/variants.vcf&quot;</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>sample_meta <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pop =</span> <span class="fu">substr</span>(<span class="fu">colnames</span>(dat), <span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>sample_meta<span class="sc">$</span>pop <span class="ot">&lt;-</span> <span class="fu">factor</span>(sample_meta<span class="sc">$</span>pop, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;GA&quot;</span>, <span class="st">&quot;HP&quot;</span>, <span class="st">&quot;BC&quot;</span>, <span class="st">&quot;PC&quot;</span>, <span class="st">&quot;TR&quot;</span>)) </span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sample.meta</span>(dat) <span class="ot">&lt;-</span> sample_meta</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">genotypes</span>(dat)[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># read in data file:</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_vcf</span>(<span class="st">&quot;~/shared_materials/tutorial_files/variants.vcf&quot;</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># add meta data information:</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="do">## population</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>sample_meta <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pop =</span> <span class="fu">substr</span>(<span class="fu">colnames</span>(dat), <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="do">## order the population</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>sample_meta<span class="sc">$</span>pop <span class="ot">&lt;-</span> <span class="fu">factor</span>(sample_meta<span class="sc">$</span>pop, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;GA&quot;</span>, <span class="st">&quot;HP&quot;</span>, <span class="st">&quot;BC&quot;</span>, <span class="st">&quot;PC&quot;</span>, <span class="st">&quot;TR&quot;</span>)) </span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;ho&quot;</span>)<span class="sc">$</span>weighted.means) <span class="co">#retrieving the results</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate fst between the populations</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>my.dat <span class="ot">&lt;-</span> <span class="fu">calc_pairwise_fst</span>(dat, <span class="at">facets=</span><span class="st">&quot;pop&quot;</span>, <span class="at">method =</span> <span class="st">&quot;WC&quot;</span>)</span></code></pre></div>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co"># assign meta data to dat</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">sample.meta</span>(dat) <span class="ot">&lt;-</span> sample_meta</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co"># what does the actual data look like?</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu">genotypes</span>(dat)[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate fst between the populations</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>my.dat <span class="ot">&lt;-</span> <span class="fu">calc_pairwise_fst</span>(dat, <span class="at">facets=</span><span class="st">&quot;pop&quot;</span>, <span class="at">method =</span> <span class="st">&quot;WC&quot;</span>)</span></code></pre></div>
 <p>Now that we’ve estimated Fst, we can look at our results:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;fst&quot;</span>))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_pairwise_fst_heatmap</span>(my.dat, <span class="at">facets=</span><span class="st">&quot;pop&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># first look at the results, just the head</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;fst&quot;</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># heatmap of the fst estimates:</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_pairwise_fst_heatmap</span>(my.dat, <span class="at">facets=</span><span class="st">&quot;pop&quot;</span>)</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
 <p>Again, does this make sense biologically?</p>
 </div>
 <p><br></p>
 <p>We can also ask if our populations follow isolation by distance.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;fst&quot;</span>))</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_pairwise_fst_heatmap</span>(my.dat, <span class="at">facets=</span><span class="st">&quot;pop&quot;</span>)</span>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pull out the fst estimates first:</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fst_out <span class="ot">&lt;-</span> <span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;fst&quot;</span>)<span class="sc">$</span>weighted.means</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># isolation by distance</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>fst_out <span class="ot">&lt;-</span> <span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;fst&quot;</span>)<span class="sc">$</span>weighted.means</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># I have pre-calculated the ditances between the populations, found in the following file.</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>distances <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;~/shared_materials/tutorial_files/distances.csv&quot;</span>, <span class="at">header=</span>T)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>dist.df <span class="ot">&lt;-</span> <span class="fu">merge</span>(distances, fst_out, <span class="at">by=</span><span class="st">&quot;subfacet&quot;</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span>  <span class="fu">ggplot</span>(dist.df,<span class="fu">aes</span>(<span class="at">x=</span>distance,<span class="at">y=</span>weighted_mean_fst)) <span class="sc">+</span> </span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>p</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co"># and we can add the population labels</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">geom_text</span>(<span class="at">label=</span>dist.df<span class="sc">$</span>subfacet)</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># then add a regression line:</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm)</span></code></pre></div>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># I have pre-calculated the ditances between the populations, found in the following file.</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>distances <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;~/shared_materials/tutorial_files/distances.csv&quot;</span>, <span class="at">header=</span>T)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="do">## the distances are in km</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># merge our dataframes:</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>dist.df <span class="ot">&lt;-</span> <span class="fu">merge</span>(distances, fst_out, <span class="at">by=</span><span class="st">&quot;subfacet&quot;</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span>  <span class="fu">ggplot</span>(dist.df,<span class="fu">aes</span>(<span class="at">x=</span>distance,<span class="at">y=</span>weighted_mean_fst)) <span class="sc">+</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>p</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># and we can add the population labels</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">geom_text</span>(<span class="at">label=</span>dist.df<span class="sc">$</span>subfacet)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co"># then add a regression line:</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm)</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
 <p>I hope you’ll see that these results look a little funny. Can you

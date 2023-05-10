@@ -1637,55 +1637,277 @@ div.tocify {
   padding: 20px
 }
 </style>
-<p><br></p>
+<div id="outlier-scans" class="section level1">
+<h1>Outlier scans</h1>
+<br>
 <div class="lecture-box">
-
+<p>Short lecture on methods to detect selection</p>
 </div>
 <p><br></p>
+<div id="fst-outlier-scans" class="section level3">
+<h3>fst outlier scans</h3>
+<p>We will use fst outlier scans- these are common and relatively simply
+to conduct. It is first useful to see the distribution of the fst
+estimates between our populations. We can do this with
+histograms/ridgeplots from the values we calcuate in snpR</p>
+</div>
+<div id="pairwise-fst-density-plots" class="section level3">
+<h3>pairwise fst density plots</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(snpR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># these are mostly the same steps as with the population structure.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read_vcf</span>(<span class="st">&quot;~/shared_materials/tutorial_files/variants.vcf&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>sample_meta <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pop =</span> <span class="fu">substr</span>(<span class="fu">colnames</span>(dat), <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sample_meta<span class="sc">$</span>pop <span class="ot">&lt;-</span> <span class="fu">factor</span>(sample_meta<span class="sc">$</span>pop, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;GA&quot;</span>, <span class="st">&quot;HP&quot;</span>, <span class="st">&quot;BC&quot;</span>, <span class="st">&quot;PC&quot;</span>, <span class="st">&quot;TR&quot;</span>)) </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">sample.meta</span>(dat) <span class="ot">&lt;-</span> sample_meta</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># we now do the same calculations as before, but now faceting by population and chromosome.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>my.dat <span class="ot">&lt;-</span> <span class="fu">calc_pairwise_fst</span>(dat, <span class="at">facets=</span><span class="st">&quot;pop.CHROM&quot;</span>, <span class="at">method =</span> <span class="st">&quot;WC&quot;</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>fst_out <span class="ot">&lt;-</span> <span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop.CHROM&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;fst&quot;</span>)<span class="sc">$</span>pairwise</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># the pairwise, above says to grab the pariwise fst estimates.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># there are a bunch of NA&#39;s,  because there isn&#39;t variation between some of the populations remove these</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(fst_out<span class="sc">$</span>fst))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>fst_out <span class="ot">&lt;-</span> fst_out <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(fst)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(fst_out<span class="sc">$</span>fst))</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># there are also negative values, these are due to the sample size correction in the fst calculation</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="do">## set these to zero</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>fst_out<span class="sc">$</span>fst[fst_out<span class="sc">$</span>fst <span class="sc">&lt;</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># density plots:</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># we can first plot density plots of the estimates</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>( fst_out, <span class="fu">aes</span>(<span class="at">x=</span>fst, <span class="at">y=</span>comparison)) <span class="sc">+</span> </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_ridges</span>(<span class="at">quantile_lines=</span><span class="cn">TRUE</span>, <span class="at">quantiles=</span><span class="dv">2</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># and we can grab means for each</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>fst_out <span class="sc">%&gt;%</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(comparison) <span class="sc">%&gt;%</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean =</span> <span class="fu">mean</span>(fst), <span class="at">sd =</span> <span class="fu">sd</span>(fst), <span class="at">median=</span><span class="fu">median</span>(fst))</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
-
+<p>Lets talk about the fst distributions.</p>
 </div>
 <p><br></p>
-<div id="outlier-scan" class="section level1">
-<h1>Outlier scan</h1>
-<div id="fst" class="section level3">
-<h3>fst</h3>
-<p>can do big windows, then selection scan?</p>
-<p><a href="https://owensgl.github.io/biol525D/Topic_8-9/fst.html" class="uri">https://owensgl.github.io/biol525D/Topic_8-9/fst.html</a></p>
-<p>plot the pairwise fst density plots</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r fold-hide"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in all in a list</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>take all, merge, make ridgeplot <span class="cf">for</span> each.</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>a</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div>
-<p>plot correlation plots</p>
-<p>For example, if we want the pairwise fst between GA and TR, we do the
-following:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>my.dat <span class="ot">&lt;-</span> <span class="fu">calc_pi</span>(dat, <span class="at">facets=</span><span class="st">&quot;pop&quot;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>fst_out <span class="ot">&lt;-</span> <span class="fu">get.snpR.stats</span>(my.dat, <span class="at">facets =</span> <span class="st">&quot;pop&quot;</span>, <span class="at">stats =</span> <span class="st">&quot;fst&quot;</span>)<span class="sc">$</span>weighted.means</span></code></pre></div>
 </div>
-<div id="gene-environment-associations-or-selection-scans." class="section level2">
-<h2>gene environment associations or selection scans.</h2>
-<p>baypass? bayenv? lfmm? pcadapt is probably easiest.</p>
+<div id="fst-outlier-scan" class="section level3">
+<h3>Fst outlier scan</h3>
+<p>We can next look at each snp as ask if it is an outlier and
+putatively under selection.</p>
+<p>For simplicity, we’ll first just look at chromosome 1.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter down to only chromosome 1</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>chr1 <span class="ot">&lt;-</span> fst_out <span class="sc">%&gt;%</span> <span class="fu">filter</span>(CHROM <span class="sc">==</span>  <span class="st">&quot;chr1&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># make plot</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(chr1, <span class="fu">aes</span>(<span class="at">x =</span> position, <span class="at">y =</span> fst, <span class="at">color =</span> comparison)) <span class="sc">+</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>comparison, <span class="at">ncol=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div>
+<p><br></p>
+<div class="text-box">
+<p>How would we identify outliers?</p>
 </div>
-<div id="gwas" class="section level2">
-<h2>gwas</h2>
-<p>gemma?</p>
+<p><br></p>
+<div id="smoothed-average" class="section level4">
+<h4>Smoothed average</h4>
+<p>And we can add a smoothed average to get broad patterns across the
+genome.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>chr1 <span class="ot">&lt;-</span> <span class="fu">calc_smoothed_averages</span>(<span class="at">x =</span> my.dat, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">facets =</span> <span class="st">&quot;pop.CHROM&quot;</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">sigma =</span> <span class="dv">50</span>, <span class="co"># using a window size of 50 kb</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">step =</span> <span class="dv">25</span>) <span class="co"># using a step size of 10kb between windows</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># pull out the smoothed values</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>fst_smooth <span class="ot">&lt;-</span> <span class="fu">get.snpR.stats</span>(chr1, <span class="at">facets =</span> <span class="st">&quot;pop.CHROM&quot;</span>, <span class="at">stats =</span><span class="st">&quot;fst&quot;</span>)<span class="sc">$</span>pairwise.window</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># parse down to just chromosome 1 again</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>chr1_smooth <span class="ot">&lt;-</span> fst_smooth <span class="sc">%&gt;%</span> <span class="fu">filter</span>(snp.subfacet <span class="sc">==</span>  <span class="st">&quot;chr1&quot;</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># have to change the column names to match:</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(chr1_smooth)[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;comparison&quot;</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># add our smoothed values to the previous plot</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span>  <span class="fu">geom_line</span>(<span class="at">data=</span>chr1_smooth,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">aes</span>(<span class="at">x=</span>position,<span class="at">y=</span>fst), <span class="at">color=</span><span class="st">&quot;black&quot;</span>)</span></code></pre></div>
+<p><br></p>
+<div class="text-box">
+<p>Are there any genomic regions that appear to be under selection?</p>
 </div>
-<div id="intersection-between-the-two" class="section level2">
-<h2>intersection between the two?</h2>
+<p><br></p>
+</div>
+<div id="classic-manhattan-plot" class="section level4">
+<h4>“Classic” manhattan plot</h4>
+<p>Our previous plot was only one chromosome. We might want to plot all
+our chromosomes. We can use the <a href="https://github.com/stephenturner/qqman">qqman</a> package to do
+this. This might be useful for some of you in your projects later.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;qqman&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qqman)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># subset data to just one comparison:</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>HP_PC <span class="ot">&lt;-</span> fst_out <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comparison <span class="sc">==</span>  <span class="st">&quot;HP~PC&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># make a new dataframe that fits the qqman requirements:</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>qqdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">SNP =</span> HP_PC<span class="sc">$</span>ID,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">CHR =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(HP_PC<span class="sc">$</span>CHROM, <span class="dv">4</span>,<span class="dv">4</span>)),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                   <span class="at">BP =</span> HP_PC<span class="sc">$</span>position,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                   <span class="at">P =</span> HP_PC<span class="sc">$</span>fst</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># make the manhattan plot</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">manhattan</span>(qqdf,<span class="at">logp =</span> <span class="cn">FALSE</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>))</span></code></pre></div>
 </div>
 </div>
-<div id="things-to-do" class="section level1">
-<h1>things to do:</h1>
-<p>consider parsing down to fewer chromosomes</p>
-<p>Asmixture runs too slow. drop some samples?</p>
-<p>R libraries: ggplot2 ggridges</p>
+</div>
+<div id="statistical-test-for-outliers" class="section level1">
+<h1>Statistical test for outliers</h1>
+<p>We can use multiple programs and test to determine if a variant is an
+outlier. In the most simple test, we could just take the top 1% (or
+whatever threshold). But there are better ways to actually determine if
+a locus is an outlier.</p>
+<p>Common methods include:</p>
+<ul>
+<li><a href="http://cmpg.unibe.ch/software/BayeScan/">Bayescan</a></li>
+<li><a href="https://bcm-uga.github.io/pcadapt/articles/pcadapt.html">PCadapt</a></li>
+<li><a href="https://github.com/whitlock/OutFLANK">outFLANK</a></li>
+</ul>
+<p>We will use outFLANK today.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># thanks to Rachael Bay&#39;s tutorial for some of this: https://baylab.github.io/MarineGenomics/week-7-fst-and-outlier-analysis.html</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(OutFLANK)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># we need to get our genotypes to the format 0, 1, 2, which means homozygous ref, heterozygote, homozygous alternate</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># it is probably easiest to use the package vcfR to do this:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vcfR)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.vcfR</span>(<span class="st">&quot;~/shared_materials/tutorial_files/variants.vcf&quot;</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># pull out the genotypes:</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>geno <span class="ot">&lt;-</span> <span class="fu">extract.gt</span>(dat)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(geno)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(geno[,<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>])</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># we need to convert the genotypes from 0/0, 0/1, 1/1 to 0, 1, 2</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>geno[geno <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;0/0&quot;</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>geno[geno  <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;0/1&quot;</span>, <span class="st">&quot;1/0&quot;</span>)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>geno[geno <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;1/1&quot;</span>)] <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># and missing values need to be 9</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>geno[<span class="fu">is.na</span>(geno)] <span class="ot">&lt;-</span> <span class="dv">9</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># finally, the matrix needs to be converted to longforamt where SNPs as columns and individuals as rows</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>tgeno <span class="ot">&lt;-</span> <span class="fu">t</span>(geno)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(tgeno)</span></code></pre></div>
+<p>We can now calculate Fst (again). But first we need to subset down
+our genotypes to just the populations we care about. We can drop the
+rows that have the wrong indivs, the rownames have the individual
+ids.</p>
+<p>Let’s compare HP and PC, because they are close together, but have
+very different phenotypes</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the population files :</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>HP <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;~/shared_materials/tutorial_files/HP.pop&quot;</span>, <span class="at">header=</span>F)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>PC <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;~/shared_materials/tutorial_files/PC.pop&quot;</span>, <span class="at">header=</span>F)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># subset. Find just the rownames that are in our HP and PC df&#39;s</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>genoSub <span class="ot">&lt;-</span> tgeno[<span class="fu">row.names</span>(tgeno) <span class="sc">%in%</span> <span class="fu">c</span>(HP<span class="sc">$</span>V1, PC<span class="sc">$</span>V1),] </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>genoSub[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># and then get the population ids:</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>pops <span class="ot">&lt;-</span> <span class="fu">substr</span>(<span class="fu">row.names</span>(genoSub), <span class="dv">1</span>, <span class="dv">2</span>)</span></code></pre></div>
+<p>Because we subset down, some of our variants are no longer vairable
+in our populations. We need to drop these.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the column indices where all values are 0 (homozygous)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>remove_0 <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">apply</span>(genoSub, <span class="dv">2</span>, <span class="cf">function</span>(x) <span class="fu">all</span>(x <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;0&quot;</span>))))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#apply takes:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#  1. The data object you want to apply the function to.</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. A value of either 1 or 2, which specifies whether you want to apply the function to the rows or columns of the data object, respectively.</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. The function you want to apply.</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># remove the columns from the dataframe</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>genoSub <span class="ot">&lt;-</span> genoSub[, <span class="sc">-</span>remove_0]</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>genoSub[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>remove_2 <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">apply</span>(genoSub, <span class="dv">2</span>, <span class="cf">function</span>(x) <span class="fu">all</span>(x <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;2&quot;</span>))))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>genoSub <span class="ot">&lt;-</span> genoSub[, <span class="sc">-</span>remove_2]</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>genoSub[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># remove when all hets:</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>remove_h <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">apply</span>(genoSub, <span class="dv">2</span>, <span class="cf">function</span>(x) <span class="fu">all</span>(x <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>))))</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>genoSub <span class="ot">&lt;-</span> genoSub[, <span class="sc">-</span>remove_h]</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># finally, covert our genotype matrix to numeric:</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>genoSub <span class="ot">&lt;-</span> <span class="fu">apply</span>(genoSub, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), as.numeric) <span class="co"># c(1,2) means do over both rows and columns</span></span></code></pre></div>
+<p>We are now ready to run outflank.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run outflank:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># first calculate fst</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>fst <span class="ot">&lt;-</span> <span class="fu">MakeDiploidFSTMat</span>(genoSub,<span class="at">locusNames=</span><span class="fu">colnames</span>(genoSub),<span class="at">popNames=</span>pops)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fst)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># and we can look at the histogram of the values.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(fst<span class="sc">$</span>FST,<span class="at">breaks=</span><span class="dv">100</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fst<span class="sc">$</span>FST) </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># lets fit our model to determine if we have outliers:</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># fitting a Chi-Squared distribution, are there more snps in the tail than we expect by chance?</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>OF <span class="ot">&lt;-</span> <span class="fu">OutFLANK</span>(fst,<span class="at">LeftTrimFraction=</span><span class="fl">0.05</span>,<span class="at">RightTrimFraction=</span><span class="fl">0.05</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">Hmin=</span><span class="fl">0.1</span>,<span class="at">NumberOfSamples=</span><span class="dv">2</span>,<span class="at">qthreshold=</span><span class="fl">0.05</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">OutFLANKResultsPlotter</span>(OF,<span class="at">withOutliers=</span>T,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">NoCorr=</span>T,<span class="at">Hmin=</span><span class="fl">0.1</span>,<span class="at">binwidth=</span><span class="fl">0.005</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">Zoom=</span>F,<span class="at">RightZoomFraction=</span><span class="fl">0.05</span>,<span class="at">titletext=</span><span class="cn">NULL</span>)</span></code></pre></div>
+<p><br></p>
+<div class="text-box">
+<p>Talk about what outflank is doing.</p>
+</div>
+<p><br></p>
+<p>Now we can pull out the outliers</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(OF<span class="sc">$</span>results<span class="sc">$</span>OutlierFlag <span class="sc">==</span> <span class="cn">TRUE</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>P1 <span class="ot">&lt;-</span> <span class="fu">pOutlierFinderChiSqNoCorr</span>(fst,<span class="at">Fstbar=</span>OF<span class="sc">$</span>FSTNoCorrbar,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">dfInferred=</span>OF<span class="sc">$</span>dfInferred,<span class="at">qthreshold=</span><span class="fl">0.05</span>,<span class="at">Hmin=</span><span class="fl">0.1</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>outliers <span class="ot">&lt;-</span> P1<span class="sc">$</span>LocusName[<span class="fu">which</span>(P1<span class="sc">$</span>OutlierFlag<span class="sc">==</span><span class="cn">TRUE</span>)] <span class="co">#which of the SNPs are outliers?</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(outliers)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(P1<span class="sc">$</span>LocusName,P1<span class="sc">$</span>FST,<span class="at">xlab=</span><span class="st">&quot;Position&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;FST&quot;</span>,<span class="at">col=</span><span class="fu">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="at">alpha=</span><span class="fl">0.1</span>))</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(P1<span class="sc">$</span>LocusName[outliers],P1<span class="sc">$</span>FST[outliers],<span class="at">col=</span><span class="st">&quot;magenta&quot;</span>)</span></code></pre></div>
+<p>But you should notice that our plot doesn’t show chromsosomes. Let’s
+go back to our manhattan plot with qqman and make this look better:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>HP_PC <span class="ot">&lt;-</span> fst_out <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comparison <span class="sc">==</span>  <span class="st">&quot;HP~PC&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># make a new dataframe that fits the qqman requirements:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>qqdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">SNP =</span> HP_PC<span class="sc">$</span>ID,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">CHR =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(HP_PC<span class="sc">$</span>CHROM, <span class="dv">4</span>,<span class="dv">4</span>)),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">BP =</span> HP_PC<span class="sc">$</span>position,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                   <span class="at">P =</span> HP_PC<span class="sc">$</span>fst)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="er">)</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># make the manhattan plot</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">manhattan</span>(qqdf,<span class="at">logp =</span> <span class="cn">FALSE</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">highlight =</span> outliers)</span></code></pre></div>
+<p>We could also look at our outlier regions more closely:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">manhattan</span>(<span class="fu">subset</span>(qqdf, CHR <span class="sc">==</span> <span class="dv">2</span>), <span class="at">highlight =</span> outliers, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">31716537</span>, <span class="dv">32043405</span>), <span class="at">main =</span> <span class="st">&quot;Chr 2&quot;</span>, <span class="at">logp =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p><br></p>
+<div class="text-box">
+<p>Look at the other outlier regions more closely. Do you think they’re
+reliable?</p>
+</div>
+<p><br></p>
 </div>
 
 
