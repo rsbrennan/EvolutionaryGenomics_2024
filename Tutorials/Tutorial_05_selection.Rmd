@@ -376,7 +376,7 @@ manhattan(subset(qqdf, CHR == 2), highlight = outliers,
 
 <div class = "text-box">
 
-Look at the other outlier regions more closely. Do you think they're reliable?
+Look at the other outlier regions more closely like we did with qqman. Do you think they're reliable?
 
 </div>
 
