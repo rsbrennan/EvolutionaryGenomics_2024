@@ -1,0 +1,403 @@
+---
+title: "Selection"
+output:
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
+---
+
+
+<style>
+.text-box {
+  background-color: #d4e9fc;
+  color: black;
+  font-size: 14px;
+  border-radius: 5px; 
+  padding: 20px
+}
+</style>
+
+<style>
+.lecture-box {
+  background-color: #f7e1fc;
+  color: black;
+  font-size: 14px;
+  border-radius: 5px; 
+  padding: 20px
+}
+</style>
+
+<br>
+
+<div class = "lecture-box">
+
+</div>
+
+<br>
+
+<br>
+
+<div class = "text-box">
+
+</div>
+
+<br>
+
+
+# Outlier scans
+
+
+<br>
+<div class = "lecture-box">
+  
+  Short lecture on methods to detect selection
+
+</div>
+  
+<br>
+
+### fst outlier scans
+
+We will use fst outlier scans- these are common and relatively simply to conduct. It is first useful to see the distribution of the fst estimates between our populations. We can do this with histograms/ridgeplots from the values we calcuate in snpR
+
+### pairwise fst density plots
+
+```{r, eval=F}
+library(snpR)
+library(ggplot2)
+library(tidyverse)
+library(ggridges)
+
+# these are the same steps as with the population structure.
+dat <- read_vcf("~/shared_materials/tutorial_files/variants.vcf")
+
+sample_meta <- data.frame(pop = substr(colnames(dat), 1, 2))
+sample_meta$pop <- factor(sample_meta$pop, levels=c("GA", "HP", "BC", "PC", "TR")) 
+
+sample.meta(dat) <- sample_meta
+
+# need to assign snp metadata too so we can split by chromosome later.
+snp.meta(dat) <- dat$CHROM
+
+# we now do the same calculations as before, but now faceting by population and chromosome.
+my.dat <- calc_pairwise_fst(dat, facets="pop.CHROM", method = "WC")
+fst_out <- get.snpR.stats(my.dat, facets = "pop.CHROM", stats = "fst")$pairwise
+
+# there are a bunch of NA's,  because there isn't variation between the populations remove these
+sum(is.na(fst_out$fst))
+
+fst_out <- fst_out %>% drop_na(fst)
+sum(is.na(fst_out$fst))
+
+# there are also negative values, these are due to the correction mainly in the fst calculation
+## set these to zero
+fst_out$fst[fst_out$fst < 0] <- 0
+
+# density plots:
+
+# we can first plot density plots of the estimates
+
+ggplot( fst_out, aes(x=fst, y=comparison)) + 
+  geom_density_ridges(quantile_lines=TRUE, quantiles=2)
+
+
+# and we can grab means for each
+fst_out %>%
+  group_by(comparison) %>%
+  summarize(mean = mean(fst), sd = sd(fst), median=median(fst))
+```
+
+
+### Fst outlier scan
+
+We can next look at each snp as ask if it is an outlier and putatively under selection.
+
+For simplicity, we'll first just look at chromosome 1.
+
+```{r, eval=F}
+
+# filter down to just chromosome 1
+chr1 <- fst_out %>% filter(CHROM ==  "chr1")
+
+# make plot
+p <- ggplot(chr1, aes(x = position, y = fst, color = comparison)) + 
+  geom_point(alpha = 0.1) + 
+  theme_bw() +
+  facet_wrap(~comparison, ncol=1) +
+  ylim(0,1)
+
+```
+
+
+And we can add a smoothed average to get broad patterns across the genome.
+
+```{r, eval=F}
+
+chr1 <- calc_smoothed_averages(x = my.dat, 
+                              facets = "pop.CHROM",
+                               sigma = 50, # using a window size of 50 kb
+                               step = 10) # using a step size of 10kb between windows
+
+# pull out the smoothed values
+fst_smooth <- get.snpR.stats(chr1, facets = "pop.CHROM", stats ="fst")$pairwise.window
+
+# parse down to just chromosome 1 again
+chr1_smooth <- fst_smooth %>% filter(snp.subfacet ==  "chr1")
+
+# have to change the column names to match:
+colnames(chr1_smooth)[2] <- c("comparison")
+
+# add our smoothed values to the previous plot
+p +  geom_line(data=chr1_smooth,
+                  aes(x=position,y=fst), color="black")
+
+
+```
+
+<br>
+
+<div class="text-box">
+
+Are there any genomic regions that appear to be under selection?
+
+</div>
+
+<br>
+
+#### True manhattan plot
+
+Our previous plot was only one chromosome. We might want to plot all our chromosomes. We can use the qqman package to do this. This might be useful for some of you in your projects later.
+
+```{r, eval=F}
+
+############################
+#  qqman
+
+install.packages("qqman")
+library(qqman)
+
+# subset data to just one comparison:
+GA_TR <- fst_out %>% filter(comparison ==  "GA~TR")
+
+# make a new dataframe that fits the qqman requirements:
+##
+qqdf <- data.frame(SNP = GA_TR$ID,
+                   CHR = as.numeric(substr(GA_TR$CHROM, 4,4)),
+                   BP = GA_TR$position,
+                   P = GA_TR$fst
+                    )
+
+manhattan(qqdf,logp = FALSE, ylim=c(0,1))
+
+```
+
+
+# Statistical test for outliers
+
+```{r, eval=F}
+library(snpR)
+library(ggplot2)
+library(tidyverse)
+library(ggridges)
+
+dat <- read_vcf("~/shared_materials/tutorial_files/variants.vcf")
+
+sample_meta <- data.frame(pop = substr(colnames(dat), 1, 2))
+sample_meta$pop <- factor(sample_meta$pop, levels=c("GA", "HP", "BC", "PC", "TR")) 
+
+sample.meta(dat) <- sample_meta
+
+# need to assign snp metadata too
+snp.meta(dat) <- dat$CHROM
+
+my.dat <- calc_pairwise_fst(dat, facets="pop.CHROM", method = "WC")
+fst_out <- get.snpR.stats(my.dat, facets = "pop.CHROM", stats = "fst")$pairwise
+
+# there are a bunch of NA's,  because there isn't variation between the populations remove these
+sum(is.na(fst_out$fst))
+
+fst_out <- fst_out %>% drop_na(fst)
+sum(is.na(fst_out$fst))
+
+# there are also negative values, these are due to the correction mainly in the fst calculation
+## set these to zero
+fst_out$fst[fst_out$fst < 0] <- 0
+
+
+# density plots:
+
+# we can first plot density plots of the estimates
+
+ggplot( fst_out, aes(x=fst, y=comparison)) + 
+  geom_density_ridges(quantile_lines=TRUE, quantiles=2)
+
+
+# and we can grab means for each
+fst_out %>%
+  group_by(comparison) %>%
+  summarize(mean = mean(fst), sd = sd(fst), median=median(fst))
+
+
+
+chr1 <- fst_out %>% filter(CHROM ==  "chr1")
+
+p <- ggplot(chr1, aes(x = position, y = fst, color = comparison)) + 
+  geom_point(alpha = 0.1) + 
+  theme_bw() +
+  facet_wrap(~comparison, ncol=1) +
+  ylim(0,1)# facet wrap on chr to split by linkage chr/chromosome.
+
+# we can also create smoothed averages to better visualize where we may have outliers:
+
+chr1 <- calc_smoothed_averages(x = my.dat, 
+                               facets = "pop.CHROM",
+                               sigma = 50, # using a window size of 50 kb
+                               step = 10) # using a step size of 50 between windows
+
+fst_smooth <- get.snpR.stats(chr1, facets = "pop.CHROM", stats ="fst")$pairwise.window
+chr1_smooth <- fst_smooth %>% filter(snp.subfacet ==  "chr1")
+
+# have to change the column names to match:
+colnames(chr1_smooth)[2] <- c("comparison")
+
+# Plot 
+p +  geom_line(data=chr1_smooth,
+               aes(x=position,y=fst), color="black")
+
+
+
+############################
+#  qqman
+
+# Alternatively, we can use the qqman package, which is in a bit more standard format plot output
+
+install.packages("qqman")
+library(qqman)
+
+# subset data to just one comparison:
+GA_TR <- fst_out %>% filter(comparison ==  "GA~TR")
+
+# make a new dataframe that fits the qqman requirements:
+##
+
+qqdf <- data.frame(SNP = GA_TR$ID,
+                   CHR = as.numeric(substr(GA_TR$CHROM, 4,4)),
+                   BP = GA_TR$position,
+                   P = GA_TR$fst
+)
+
+manhattan(qqdf,logp = FALSE, ylim=c(0,1))
+
+
+
+###################
+# outflank
+###################
+
+# thanks to Rachael Bay's tutorial for some of this: https://baylab.github.io/MarineGenomics/week-7-fst-and-outlier-analysis.html
+
+
+library(OutFLANK)
+
+# we need to get our genotypes to the format 0, 1, 2, which means homozygous ref, heterozygote, homozygous alternate
+# it is probably easiest to use the package vcfR to do this:
+install.packages("vcfR")
+
+library(vcfR)
+
+dat <- read.vcfR("~/shared_materials/tutorial_files/variants.vcf")
+
+# pull out the genotypes:
+geno <- extract.gt(dat)
+dim(geno)
+
+head(geno[,1:10])
+
+# we need to convert the genotypes from 0/0, 0/1, 1/1 to 0, 1, 2
+
+geno[geno %in% c("0/0")] <- 0
+geno[geno  %in% c("0/1")] <- 1
+geno[geno %in% c("1/1")] <- 2
+geno[is.na(geno)] <- 9
+tgeno <- t(geno)
+dim(tgeno)
+
+# tgeno is the correct input: SNPs as columns and individuals as rows
+
+# we can now calculate Fst between TR and GA populations
+## but first we need to subset down our genotypes
+## we can drop the rows that have the wrong indivs, the rownames have the individual ids.
+
+HP <- read.table("~/shared_materials/tutorial_files/HP.pop", header=F)
+TR <- read.table("~/shared_materials/tutorial_files/PC.pop", header=F)
+
+
+genoSub <- tgeno[row.names(tgeno) %in% c(HP$V1, TR$V1),] #subset method 1
+
+genoSub[1:10,1:10]
+
+# and then get the population ids:
+pops <- substr(row.names(genoSub), 1, 2)
+
+# get the column indices where all values are 0 or 2
+remove_0 <- which(apply(genoSub, 2, function(x) all(x %in% c("0"))))
+
+#apply takes:
+#  1. The data object you want to apply the function to.
+# 2. A value of either 1 or 2, which specifies whether you want to apply the function to the rows or columns of the data object, respectively.
+# 3. The function you want to apply.
+
+# remove the columns from the dataframe
+genoSub <- genoSub[, -remove_0]
+genoSub[1:10,1:10]
+
+remove_2 <- which(apply(genoSub, 2, function(x) all(x %in% c("2"))))
+genoSub <- genoSub[, -remove_2]
+genoSub[1:10,1:10]
+
+# remove when all hets:
+remove_h <- which(apply(genoSub, 2, function(x) all(x %in% c("1"))))
+genoSub <- genoSub[, -remove_h]
+
+genoSub <- apply(genoSub, c(1, 2), as.numeric) # c(1,2) means do over both rows and columns
+
+
+# run outflank:
+# first calculate fst
+fst <- MakeDiploidFSTMat(genoSub,locusNames=1:ncol(genoPrune),popNames=pops)
+
+head(fst)
+
+hist(fst$FST,breaks=100)
+
+summary(fst$FST) 
+
+# lets fit our model to determine if we have outliers:
+# fitting a Chi-Squared distribution, are there more snps in the tail than we expect by chance?
+OF <- OutFLANK(fst,LeftTrimFraction=0.05,RightTrimFraction=0.05,
+               Hmin=0.1,NumberOfSamples=2,qthreshold=0.05)
+
+OutFLANKResultsPlotter(OF,withOutliers=T,
+                       NoCorr=T,Hmin=0.1,binwidth=0.005,
+                       Zoom=F,RightZoomFraction=0.05,titletext=NULL)
+
+sum(OF$results$OutlierFlag == TRUE, na.rm=TRUE)
+
+P1 <- pOutlierFinderChiSqNoCorr(fst,Fstbar=OF$FSTNoCorrbar,
+                                dfInferred=OF$dfInferred,qthreshold=0.05,Hmin=0.1)
+outliers <- P1$OutlierFlag==TRUE #which of the SNPs are outliers?
+table(outliers)
+
+plot(P1$LocusName,P1$FST,xlab="Position",ylab="FST",col=rgb(0,0,0,alpha=0.1))
+points(P1$LocusName[outliers],P1$FST[outliers],col="magenta")
+
+```
+
+
+
+
+
+

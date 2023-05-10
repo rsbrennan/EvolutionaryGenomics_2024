@@ -55,7 +55,7 @@ We can first make a new directory where we will analyze our population structure
 <br>
   
   ```{bash, eval=FALSE}
-VCF=~/shared_materials/variants.vcf
+VCF=~/shared_materials/tutorial_files/variants.vcf
 
 # under ~/my_materials
 mkdir diversity
@@ -70,8 +70,8 @@ In the loop below, we will estimate pi for each population.
 for pop in TR PC BC HP PL GA;
 do
 
-vcftools --vcf ~/shared_materials/variants.vcf \
---keep ~/shared_materials/${pop}.pop \
+vcftools --vcf $VCF \
+--keep ~/shared_materials/tutorial_files/${pop}.pop \
 --window-pi 50000 \
 --out ${pop}_pi_50kb;
 
@@ -105,7 +105,7 @@ library(tidyverse)
 
 # First, get the file locations and names.
 # set the directory where the files are located. 
-dir <- "~/my_materials/population_structure"
+dir <- "~/my_materials/diversity"
 # generate the paths to the files
 files <- file.path(dir, list.files(dir))
 # drop the summary files, we only want the actual pi estimates
@@ -116,12 +116,12 @@ files
 # read in files
 # lapply lets us apply the same function to all of our files. It will output a list where each item is one of our files.
 d <- lapply(files,
-                  FUN = function(files) {
-                    read.table(files, header = TRUE)
-                  })
+            FUN = function(files) {
+              read.table(files, header = TRUE)
+            })
 # but the list has no names, so we need to fix this:
 names(d)
-d <- setNames(d,(str_split_fixed(files, "/", 4)[,4] %>% str_split_fixed( "[_]", 3))[,1])
+d <- setNames(d,(str_split_fixed(files, "/", 5)[,4] %>% str_split_fixed( "[_]", 3))[,1])
 names(d)
 
 # you can now access each item in the in two ways. 
@@ -157,14 +157,16 @@ library(ggridges)
 
 # we can first plot density plots of the estimates
 
-ggplot( meltdat, aes(x=PI, y=id)) + 
-  geom_density_ridges(quantile_lines=TRUE, quantiles=2)
+ggplot( meltdat, aes(x=PI, y=id, fill=id)) + 
+  geom_density_ridges(quantile_lines=TRUE, quantiles=2) +
+  theme_classic()
 
 
 # and we can grab means for each
 meltdat %>%
   group_by(id) %>%
-  summarize(mean = mean(PI), sd = sd(PI))
+  summarize(mean = mean(PI), sd = sd(PI), median = median(PI))
+
 
 ```
 
@@ -201,6 +203,10 @@ Plink is a powerful program that was designed for human genomics. This means tha
 Run the code below
 
 ```bash
+
+# first make a new directory called population_structure
+## run all calculations below in this directory
+
 plink --vcf $VCF \
 --indep-pairwise 50 5 0.2 --allow-extra-chr --double-id \
 --out variants_pruned
@@ -212,7 +218,7 @@ The real action is happening with the `--indep-pairwise` command. The first valu
 
 This command will output a two lists:
   
-  - `variants_pruned.prune.in`: the set of LD pruned SNPs
+- `variants_pruned.prune.in`: the set of LD pruned SNPs
 - `variants_pruned.prune.out`: the SNPs removed from the dataset.
 
 
@@ -244,7 +250,7 @@ Now that we have our LD pruned plink files, we can run our actual PCA, again in 
   
 ```bash
 plink --bfile variants_NoLD \
---pca --out variants_NoLD_PCA --allow-extra-chr --double-id
+  --pca --out variants_NoLD_PCA --allow-extra-chr --double-id
 ```
 
 Where `--bfile` says to read in the plink files in binary format with our specific name and `pca` is hopefully self explanatory.
@@ -263,8 +269,6 @@ This will ourput two files:
 
 library(ggplot2)
 
-setwd("~/my_materials/population_structure")
-
 dat <- read.table("variants_NoLD_PCA.eigenvec", header=F)
 eigenval <- read.table("variants_NoLD_PCA.eigenval", header=F)
 
@@ -276,8 +280,10 @@ cumsum(pve$pve)
 
 # plot the PC's
 a <- ggplot(pve, aes(PC, pve)) + geom_bar(stat = "identity") + 
-  ylab("Percentage variance explained") + theme_light()
+  ylab("Percentage variance explained") + 
+  theme_classic()
 a
+
 ```
 
 <br>
@@ -322,7 +328,9 @@ d
 
 <div class="text-box">
 
-Change the code above to plot PC1 and PC3. What do you find and do you think this makes sense?
+- Change the code above to plot PC1 and PC3. What do you find and do you think this makes sense?
+- What might this tell us about the population structure?
+
 
 </div>
 
@@ -349,15 +357,7 @@ admixture --cv variants_NoLD.bed 2 | tee log_2.out
 
 Here, we call the program with `admixture`, we use `--cv` to say we want to calculate the cross validation score (we'll get to this later), we specify our bed file, and we tell the programs how many populations to assume. The `|` and `tee` just outputs the stdout to a file that we can save. 
 
-I'm sure you remember from lecture, but we need to run this for multiple values of K in order to determine the most likely number of populations. We could just copy the code above for multiple K's, but this can be done more elegantly below:
-  
-  
-```{bash, eval=F}
-
-for K in 1 2 3 4 5; \
-do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
-
-```
+I'm sure you remember from lecture, but we need to run this for multiple values of K in order to determine the most likely number of populations. 
 
 <br>
   
@@ -369,6 +369,16 @@ What are sensible values of K to run?
 
 <br>
 
+
+We could just copy the code above for multiple K's, but this can be done more elegantly below:
+
+  
+```{bash, eval=F}
+
+for K in 1 2 3 4 5; \
+do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
+
+```
 
 and we need to grab the cross validation scores, to determine the most likely K:
 
@@ -385,15 +395,14 @@ grep -h CV log*.out | cut -f 3- -d " " > cv.txt
 
 ```{r, eval=F}
 library(tidyverse)
-setwd("~/my_materials/population_structure")
 
-samplelist <- read_tsv("~/shared_materials/indivs.txt",
+samplelist <- read_tsv("~/shared_materials/tutorial_files/indivs.txt",
                        col_names = "individual")
 
 # we could read in one data frame at a time:
 read_delim("~/my_materials/population_structure/variants_NoLD.2.Q",
-                  col_names = paste0("Q",seq(1:2)),
-                  delim=" ")
+           col_names = paste0("Q",seq(1:2)),
+           delim=" ")
 
 
 # read in all date, in a loop
@@ -404,10 +413,10 @@ all_data <- tibble(individual=character(),
                    value=numeric())
 
 # then add all results to this
-for (k in 1:6){
+for (k in 1:5){
   data <- read_delim(paste0("~/my_materials/population_structure/variants_NoLD.",k,".Q"),
-                  col_names = paste0("Q",seq(1:k)),
-                  delim=" ")
+                     col_names = paste0("Q",seq(1:k)),
+                     delim=" ")
   data$sample <- samplelist$individual
   data$k <- k
   #This step converts from wide to long.
@@ -421,8 +430,8 @@ all_data$population <- factor(all_data$population,
                               levels=c("GA", "PL", "HP", "BC", "PC", "TR"))
 
 # our orders are off in our vcf. lets re-order these from south to north. 
-orderlist <- read_tsv("~/shared_materials/population_order.txt",
-                       col_names = "sample")
+orderlist <- read_tsv("~/shared_materials/tutorial_files/population_order.txt",
+                      col_names = "sample")
 all_data$sample<-factor(all_data$sample,levels=orderlist$sample)
 
 # first, only plot k=2
@@ -436,7 +445,8 @@ all_data %>%
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_fill_brewer(palette="Set1",name="K",                    
-  labels=c("1","2"))
+                    labels=c("1","2"))
+
 ```
 
 <br>
@@ -453,6 +463,7 @@ Stop, and we will discuss this result
 
 ```{r, eval=F}
 
+
 # plot all k values.
 p <-  ggplot(all_data,aes(x=sample,y=value,fill=factor(Q))) + 
   geom_bar(stat="identity",position="stack") +
@@ -463,13 +474,13 @@ p <-  ggplot(all_data,aes(x=sample,y=value,fill=factor(Q))) +
   scale_fill_brewer(palette="Set1",name="K",
                     labels=seq(1:5)) +
   facet_wrap(~k,ncol=1)
-
+p
 # ggsave("Admixture_plot.pdf", p, width = 7, height = 15, units="in")
 
 ### what is our most likely k?
 
 # read in CV scores:
-cvin <- read.csv("cv.txt", sep=":", header=F)
+cvin <- read.csv("~/my_materials/population_structure/cv.txt", sep=":", header=F)
 colnames(cvin) <- c("id", "cv")
 # fix the formatting to get K into numeric format
 cvin$K <- substr(cvin$id, 4, 4)
@@ -477,6 +488,7 @@ cvin$K <- substr(cvin$id, 4, 4)
 # plot the results
 ggplot(cvin,aes(x=K,y=cv)) +
   geom_point(size=3)  + geom_line(group=1)
+
 
 ```
 
@@ -502,9 +514,7 @@ We can also calculate genome-wide Fst to understand how population may be struct
 ```{r, eval=F}
 library(snpR)
 
-setwd("~/my_materials/population_structure")
-
-dat <- read_vcf("~/shared_materials/variants.vcf")
+dat <- read_vcf("~/shared_materials/tutorial_files/variants.vcf")
 
 sample_meta <- data.frame(pop = substr(colnames(dat), 1, 2))
 sample_meta$pop <- factor(sample_meta$pop, levels=c("GA", "HP", "BC", "PC", "TR")) 
@@ -515,13 +525,15 @@ genotypes(dat)[1:6, 1:6]
 
 head(get.snpR.stats(my.dat, facets = "pop", stats = "ho")$weighted.means) #retrieving the results
 
+# calculate fst between the populations
 my.dat <- calc_pairwise_fst(dat, facets="pop", method = "WC")
 ```
 
 Now that we've estimated Fst, we can look at our results:
 
 ```{r, eval=F}
-#head(get.snpR.stats(my.dat, facets = "pop", stats = "fst"))
+
+head(get.snpR.stats(my.dat, facets = "pop", stats = "fst"))
 
 plot_pairwise_fst_heatmap(my.dat, facets="pop")
 ```
@@ -540,20 +552,28 @@ Again, does this make sense biologically?
 We can also ask if our populations follow isolation by distance. 
 
 ```{r, eval=F}
+head(get.snpR.stats(my.dat, facets = "pop", stats = "fst"))
+plot_pairwise_fst_heatmap(my.dat, facets="pop")
+
 # isolation by distance
 fst_out <- get.snpR.stats(my.dat, facets = "pop", stats = "fst")$weighted.means
 
 # I have pre-calculated the ditances between the populations, found in the following file.
-distances <- read.csv("~/shared_materials/distances.csv", header=T)
+distances <- read.csv("~/shared_materials/tutorial_files/distances.csv", header=T)
 
 dist.df <- merge(distances, fst_out, by="subfacet")
 
 p <-  ggplot(dist.df,aes(x=distance,y=weighted_mean_fst)) + 
-  geom_point()
+  geom_point() +
+  theme_classic()
 p
 
 # and we can add the population labels
-p + geom_text(label=dist.df$subfacet)
+p <- p + geom_text(label=dist.df$subfacet)
+
+# then add a regression line:
+p + geom_smooth(method=lm)
+
 
 ```
 
