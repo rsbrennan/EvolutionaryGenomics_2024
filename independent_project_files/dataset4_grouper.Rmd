@@ -58,7 +58,7 @@ The authors used ddRAD with 150bp paired end reads using an Illumina HiSeq 4000.
 
 The vcf file for this dataset is located: `~/shared_materials/Project_files/dataset_4/dataset4.vcf`
 
-Id and population of each individual: `shared_materials/Project_files/dataset_4/????`
+Id and population of each individual: `shared_materials/Project_files/dataset_4/ids.txt`
 
 Sampling locations were not provided by the authors... you could roughly estimate these by grabbing latlongs from approximate locations in google maps. This should be good enough for isolation by distance estimates, for example. 
 

@@ -61,9 +61,9 @@ Here are the sampling locations and number of individuals from each site.
 
 <br>
 
-The vcf file for this dataset is located: `shared_materials/Project_files/dataset_3/`
+The vcf file for this dataset is located: `shared_materials/Project_files/dataset_3/dataset3.vcf`
 
-Id and population of each individual: `shared_materials/Project_files/dataset_3/`
+Id and population of each individual: `shared_materials/Project_files/dataset_3/id_pops.txt`
 
 Sampling locations: `shared_materials/Project_files/dataset_3/dataset3_coords.csv`
 
