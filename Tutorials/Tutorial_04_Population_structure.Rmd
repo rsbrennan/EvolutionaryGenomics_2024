@@ -568,6 +568,23 @@ distances <- read.csv("~/shared_materials/tutorial_files/distances.csv", header=
 # merge our dataframes:
 dist.df <- merge(distances, fst_out, by="subfacet")
 
+
+```
+
+
+<br>
+
+<div class = "text-box">
+
+Plot your data to see if there is isolation by distance.
+
+</div>
+
+<br>
+
+```{r, eval=F}
+
+
 p <-  ggplot(dist.df,aes(x=distance,y=weighted_mean_fst)) + 
   geom_point() +
   theme_classic()
@@ -575,6 +592,24 @@ p
 
 # and we can add the population labels
 p <- p + geom_text(label=dist.df$subfacet)
+
+
+```
+
+
+<br>
+
+<div class = "text-box">
+
+How would you add statistical strength to your conclusion?
+
+</div>
+
+<br>
+
+
+
+```{r, eval=F}
 
 # then add a regression line:
 p + geom_smooth(method=lm)
