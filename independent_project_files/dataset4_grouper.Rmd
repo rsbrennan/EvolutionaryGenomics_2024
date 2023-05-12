@@ -44,8 +44,6 @@ In this dataset, [Payet et al.,](https://doi.org/10.1111/eva.13450) sampled popu
 </center>
 
 
-!!!!! ADD SAMPLE NUMBERS !!!!!!!
-
 <br>
 
 The authors used ddRAD with 150bp paired end reads using an Illumina HiSeq 4000. Because they had no genome, the data were anayzed with Stacks.
