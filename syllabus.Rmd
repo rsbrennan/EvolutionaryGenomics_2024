@@ -1,0 +1,44 @@
+---
+title: "Syllabus"
+output:
+  html_document:
+    theme: flatly
+---
+  
+# Fundamentals of population genomics - bioc-202
+  
+Instructor: Reid Brennan, office 36A, West Shore, rbrennan@geomar.de
+
+The course will take place 8:30-12:00 from May 5-19 in room B-106, West Shore. See the Schedule for full details.
+
+Course website: rsbrennan.github.io/EvolutionaryGenomics_2023
+
+### Course introduction
+The goal of this course is to provide a theoretical and methodological foundation in population genomics. 
+We’re at an exciting time as evolutionary biologists. It is now fairly easy to generate huge amounts of sequence data, i.e., genomics. However, the analysis and understanding of these data are not trivial. The approach in this course will be to focus on the basics of evolutionary principles and apply these basics to current genomics data. 
+
+The first week we will work together through a [tutorial](https://rsbrennan.github.io/EvolutionaryGenomics_2023/tutorials.html) using a real dataset. The second week students will [analyze their own dataset.](https://rsbrennan.github.io/EvolutionaryGenomics_2023/project_overview.html)
+
+For the entire course we will be using [cloudlab](https://cloudlab.rz.uni-kiel.de/) for our computing.
+
+The students should leave this course with strong foundation and understanding of evolutionary genomics. Learning goals include:
+  - Fundamental principles in population genomics
+- Techniques, type of data and analyses commonly used and how to apply them.
+- Realized and potential contributions of these approaches in marine sciences. 
+
+A particular emphasis will be given to the links between the questions addressed, the methods used, underlying theory, interpretation, and application of the results.
+
+### Your main responsibilities:
+- Showing up and participating
+- Supporting each other and sharing your knowledge with your classmates
+- Analyzing your independent project
+- Presenting your results and analysis to the class
+
+### Course website
+Most resources, instructions, etc., will be hosted on the course website: rsbrennan.github.io/EvolutionaryGenomics_2023. There you can find the schedule, tutorials, lecture slides, and so on. Please check this resource regularly. 
+
+### Grades
+Participation (40%), oral presentation and discussion (60%)
+
+### Schedule
+Find the schedule on the [course website](https://rsbrennan.github.io/EvolutionaryGenomics_2023/schedule.html)
