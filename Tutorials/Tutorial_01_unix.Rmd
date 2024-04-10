@@ -18,6 +18,8 @@ output:
 
 ## Introduction 
 
+test changes
+
 This tutorial is from Keith Bradnam, and modified here to fit our file structure and cloudlab. See the original at: https://github.com/KorfLab/unix_and_perl . The original version is licensed under [CC 4.0](http://creativecommons.org/licenses/by/4.0/). I have made small changes so that the output shown is what you'll see in cloudlab, but the bulk and the actual hard work is original from the prior source.
 
 This 'bootcamp' is intended to provide the reader with a basic overview of essential Unix/Linux commands that will allow them to navigate a file system and move, copy, edit files. It will also introduce a brief overview of some 'power' commands in Unix. It was orginally developed as part of a [Bioinformatics Core](http://bioinformatics.ucdavis.edu) Workshop taught at UC Davis ([Using the Linux Command-Line for Analysis of High Throughput Sequence Data](http://training.bioinformatics.ucdavis.edu/docs/2015/06/june-2015-workshop/index.html)).
