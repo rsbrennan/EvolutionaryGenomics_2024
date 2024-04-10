@@ -1,12 +1,12 @@
 Class_day,Date,Day,Topic,Tutorial_link,Lecture_slides,Other
-1,05.05.23,Friday,"Course structure and intro, Tutorial 1: unix/cloudlab",[Cloudlab](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/cloudlab.html); [Unix](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/Tutorial_01_unix.html),[Lecture 1](https://rsbrennan.github.io/EvolutionaryGenomics_2023/lectures/Lecture_01.pdf),
-2,08.05.23,Monday,Tutorial 2: Processing raw data,[Tutorial 2](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/Tutorial_02_RAW_data.html),,
-3,09.05.23,Tuesday,Tutorial 3: Working with SNPs,[Tutorial 3](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/Tutorial_03_SNP_data.html),,
-4,10.05.23,Wednesday,Tutorial 4: Population Structure,[Tutorial 4](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/Tutorial_04_Population_structure.html),,[Multiple testing example](https://rsbrennan.github.io/EvolutionaryGenomics/misc/multiple_testing.html)
-5,11.05.23,Thursday,Tutorial 5: Selection,[Tutorial 5](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/Tutorial_05_selection.html),,
-6,12.05.23,Friday,Project day 1,,,
-7,15.05.23,Monday,Project day 2,,,
-8,16.05.23,Tuesday,Project day 3,,,
-9,17.05.23,Wednesday,Project day 4,,,
-,18.05.23,Thursday,HOLIDAY,,,
-10,19.05.23,Friday,Presentation Day,,,
+1,13.05.24,Monday,"Course structure and intro, Tutorial 1: unix/cloudlab",[Cloudlab](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/cloudlab.html); [Unix](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/Tutorial_01_unix.html),[Lecture 1](https://rsbrennan.github.io/EvolutionaryGenomics_2023/lectures/Lecture_01.pdf),
+2,14.05.24,Tuesday,Tutorial 2: Processing raw data,[Tutorial 2](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_02_RAW_data.html),,
+3,15.05.24,Wednesday,Tutorial 3: Working with SNPs,[Tutorial 3](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_03_SNP_data.html),,
+4,16.05.24,Thursday,Tutorial 4: Population Structure,[Tutorial 4](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_04_Population_structure.html),,[Multiple testing example](https://rsbrennan.github.io/EvolutionaryGenomics/misc/multiple_testing.html)
+5,17.05.24,Friday,Tutorial 5: Selection,[Tutorial 5](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_05_selection.html),,
+6,20.05.24,Monday,HOLIDAY- Whit Monday,,,
+7,21.05.24,Tuesday,Project day 1,,,
+8,22.05.24,Wednesday,Project day 2,,,
+9,23.05.24,Thursday,Project day 3,,,
+10,24.05.24,Friday,Project day 4,,,
+,,,,,,
