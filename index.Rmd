@@ -19,5 +19,5 @@ We will spend the first half of the course learning methods and concepts via han
 
 See the other pages on this site for more specific information. 
 
-You can find cloudlab [here](https://lms.uni-kiel.de/auth/RepositoryEntry/5309268072/CourseNode/107413362968797) or [here](https://lms.uni-kiel.de/url/RepositoryEntry/5309268072). Remember that you need to sign in via OLAT.
+You can find cloudlab [here](https://lms.uni-kiel.de/auth/RepositoryEntry/5451644982/CourseNode/109531948798168). Remember that you need to sign in via OLAT.
 

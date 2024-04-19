@@ -85,6 +85,7 @@ We used a sequence capture approach called Rapture. See the [paper describing it
 - Id of each individual: `shared_materials/Project_files/dataset_1/dataset_1_IDs.txt`
 - Population file: `shared_materials/Project_files/dataset_1/dataset_1_Populations.txt`
 - lat long for each collection site: `shared_materials/Project_files/dataset_1/dataset_1_lat_long.txt`
+- pairwise distances between populations: `shared_materials/Project_files/dataset_1/dataset_1_pairwise_distances.txt`
 - There is no phenotype data for these individuals.
 
 
