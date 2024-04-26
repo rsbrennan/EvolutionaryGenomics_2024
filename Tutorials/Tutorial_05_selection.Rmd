@@ -329,8 +329,6 @@ Talk about what outflank is doing.
 
 Now we can pull out the outliers
 
-BROKEN!!!!
-
 ```{r, eval=F}
 
 sum(OF$results$OutlierFlag == TRUE, na.rm=TRUE)
@@ -338,14 +336,13 @@ sum(OF$results$OutlierFlag == TRUE, na.rm=TRUE)
 P1 <- pOutlierFinderChiSqNoCorr(fst,Fstbar=OF$FSTNoCorrbar,
                                 dfInferred=OF$dfInferred,qthreshold=0.05,Hmin=0.1)
 
-outliers <- P1$LocusName[which(P1$OutlierFlag==TRUE)] #which of the SNPs are outliers?
+outliers <- which(P1$OutlierFlag ==TRUE) #which of the SNPs are outliers? Note that this only returns the index
 length(outliers)
 
-plot(P1$LocusName,
-      P1$FST,
-      xlab="Position",ylab="FST",col=rgb(0,0,0,alpha=0.1))
-
-points(P1$LocusName[outliers],P1$FST[outliers],col="magenta")
+# note that we're ignoring loci with heterozygosity below 0.1, because outflank ignores these.
+plot(P1$indexOrder[P1$He>0.1], P1$FST[P1$He>0.1],
+     xlab="Position", ylab="FST", col=rgb(0,0,0,0.2))
+points(P1$indexOrder[outliers], P1$FST[outliers], col="magenta", pch=20)  
 
 ```
 
@@ -360,6 +357,10 @@ qqdf <- data.frame(SNP = fst$ID,
                    BP = HP_PC$position,
                    P = HP_PC$fst)
 )
+
+# pull out locus names for the outliers, so we can highlight
+outliers <- P1$LocusName[which(P1$OutlierFlag==TRUE)] #which of the SNPs are outliers?
+
 # make the manhattan plot
 manhattan(qqdf,logp = FALSE, ylim=c(0,1), highlight = outliers)
 

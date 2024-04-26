@@ -56,6 +56,8 @@ Short snp calling lecture
 
 ```{bash eval=FALSE, echo=FALSE}
 
+# formatting for class. reduce to just the major chromosomes. 
+
 zcat variants.vcf.gz | grep -v '^#' > variants_noheader.vcf
 
 grep -v "NW_" variants_noheader.vcf > variants_noheader.vcf2
@@ -102,8 +104,13 @@ Our vcf file is `~/shared_materials/tutorial_files/variants.vcf`.
 
 The header contains a ton of information. Mostly, these are the definitions of the abbreviations used in the rest of the file, generally how the file was generated, and various other information. The real core of the vcf can be found in the last line of the header. 
 
-  #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  BC-045-001BC-046-002       BC-047-003 ...
-  chr1    11504   chr1:11504      C       G       95103.7 .       .       GT:DP:RO:QR:AO:QA:GL       .:.:.:.:.:.:.   0/0:12:12:492:0:0:0,-3.61236,-44.6308   0/0:16:16:629:0:0:0,-4.81648,-56.9351
+Below, I'm only showing the first three samples. Additional sample would be in additional columns.
+
+Last line of header:
+`#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  BC-045-001   BC-046-002       BC-047-003 `
+
+First line of VCF:
+`chr1    11504   chr1:11504      C       G       95103.7 .       .       GT:DP:RO:QR:AO:QA:GL       .:.:.:.:.:.:.   0/0:12:12:492:0:0:0,-3.61236,-44.6308   0/0:16:16:629:0:0:0,-4.81648,-56.9351`
 
 1. `CHROM` the name of the chromosome (or scaffold) of the reference genome where the variant is located.
 2. `POS`	The 1-based position of the variation on the given sequence.
@@ -139,7 +146,7 @@ See [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf) for more info about
 
 I have given you a pre-filtered vcf file. This was mostly done for space, time, and computational reasons. 
 
-Filtering is hard and arbitrary. Generally, you need to consider the following:
+Filtering is complicated and arbitrary. Generally, you need to consider the following:
 
 - missingness: how many samples are missing data at a site? Do any individuals have a large amount of missing data?
 - Quality: genotypes that have low quality are probably not real. You should drop these.
@@ -333,7 +340,7 @@ summary(indiv_miss$fmiss)
 
 ## Filtering VCF
 
-If we saw issues above, we could add additional filters to our data. You can do this in vcftools. It woud look something like this where you would replace $NUM with your threshold. You also need to add `recode` when writing a new vcf file. And you choose the name of your filtered vcf with the `--out` variable.
+If we saw issues above, we could add additional filters to our data. You can do this in vcftools. It woud look something like this where you would replace $NUM with your threshold (which would be different for each command). You also need to add `recode` when writing a new vcf file. And you choose the name of your filtered vcf with the `--out` variable.
 
 See the vcftools manual for more info.
 
@@ -345,6 +352,7 @@ vcftools --vcf $VCF \
     --minDP $NUM \
     --maxDP $NUM \
     --maf $NUM \
+    --minQ $NUM \
     --recode \
     --out filtered_vcf
 
@@ -355,9 +363,15 @@ vcftools --vcf $VCF \
 
 <div class = "text-box">
 
-Change a few parameters and see how this influences the number of SNPs you have.
+Change a few parameters and filter your vcf. 
+
+How does this change the number of SNPs you have?
+
+What filtering options make you lost the highest number of SNPs?
 
 Which parameters do you think are most important?
+
+How do we balance filtering and retaining informative SNPs?
 
 </div>
 

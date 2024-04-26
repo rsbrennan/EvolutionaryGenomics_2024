@@ -1,0 +1,69 @@
+---
+title: "Dataset 4: Lobster"
+output:
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(knitr)
+library(dplyr)
+library(tidyr)  
+```
+
+<br>
+
+
+These data are from [Charlie Ellis and colleagues](https://doi.org/10.1111/jbi.14623). A special thanks to Charlie for providing additional data and files to help make these data suitable for these projects. 
+
+
+This dataset is focused on the European lobster (Homarus gammarus). These lobsters are widely distributed across European oceans (not including the Baltic) and are commonly fished for consumption- you might have eaten this lobster. This species is slow growing, potentially making it prone to overfishing. Adults are benthic and relatively [non-migratory](https://doi.org/10.1139/f2011-053) and solitary. Females reproduce biennially, typically producing 10's of thousands of eggs, which they brood  up to 12 months. These larvae have a 2-5 week pelagic larval duration, after which they  settle.
+
+For exploited species, it is important to understand population structure and connectivity. If populations are panmixic, they can be managed as a single population. However, if populations are structured and have limited gene flow, we need to consider management on a smaller scales as local populations have the potential to be over fished due to their isolation. 
+
+<br>
+
+### Map of sampling locations
+
+<br>
+
+<br>
+
+<center>
+![Lobster populations were sampled from 32 populations across the range. Behind each location code is the number of samples for that population. 
+](images/lobster_map.png){width=400px}
+</center>
+
+<br>
+
+### data description
+
+<br>
+
+These data consist of RAD-sequencing 236 H. gammarus from 32 locations. Sequencing consisted of RADseq using the restriction enzyme sbfI, with 150 base pair (bp), paired-end reads. 
+
+<br>
+
+### Files
+
+<br>
+
+- VCF: ``
+- Population file: ``
+- lat long for each collection site: ``
+- pairwise distances between populations: ``
+- There is no phenotype data for these individuals.
+
+
+
+### references
+
+Ellis, Charlie D., Kirsty L. MacLeod, Tom L. Jenkins, Lénia D. Rato, Youenn Jézéquel, Mišo Pavičić, David Díaz, and Jamie R. Stevens. "Shared and distinct patterns of genetic structure in two sympatric large decapods." Journal of biogeography 50, no. 7 (2023): 1271-1284.
+
+

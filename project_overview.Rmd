@@ -25,7 +25,11 @@ library(tidyr)
 
 The goal of the independent projects is for you to apply the techniques and methods we covered in the tutorials and make some conclusions about the biology of the system you're working on. 
 
-For each project, you'll have a vcf file and other relevant supporting information. It is your job to analyze these data, draw some conclusions, and present these results to the class in a ~15-20 minute presentation. 3/4 of these datasets are from published papers. Please don't look at the papers for their conclusions, that would defeat the purpose of this exercise.
+
+
+For each project, you'll have a vcf file and other relevant supporting information. It is your job to analyze these data, draw some conclusions, and make a poster  to present at the poster sesssion in July. 
+
+Three of the four datasets are from published papers. Please don't look at the papers for their conclusions, that would defeat the purpose of this exercise. However, these three datasets and papers are excellent examples of open and reproducible science. Some authors, especially [Charlie Ellis](https://drcharlieellis.wixsite.com/drlobster), even provided additional files and data to help make these projects possible. It should always be our goal to make our science as open as reproducible as these authors. 
 
 <br>
 
