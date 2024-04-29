@@ -627,4 +627,21 @@ I hope you'll see that these results look a little funny. Can you explain what i
 </div>
 
 <br>
+
+
+## extra exercises
+
+<br>
+
+<div class = "text-box">
+
+If we have time, there are other approaches to understand inbreeding and diversity of populations. For example, we might calculate expected heterozygosity. Try to do this with your data. Note, you could also calculate FIS with `snpR`
+
+Expected heterozygosity: Use [snpR](https://github.com/hemstrow/snpR) and the `calc_he()` function to calculate He for our populations. The basic approach is the same as Fst, like we did above.
+
+</div>
+
+<br>
+
+
   
