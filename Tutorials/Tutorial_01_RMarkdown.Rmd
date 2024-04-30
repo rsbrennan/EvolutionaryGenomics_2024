@@ -1,0 +1,73 @@
+---
+title: "R Markdown"
+#output:
+output:
+  html_document:
+    theme: flatly
+    #prettydoc::html_pretty:
+    #theme: cayman
+    highlight: tango
+    toc: true
+    toc_float: true
+    css: ../style.css
+---
+  
+  
+<style>
+  .text-box {
+    background-color: #d4e9fc;
+      color: black;
+    font-size: 14px;
+    border-radius: 5px; 
+    padding: 20px
+  }
+</style>
+  
+<style>
+  .lecture-box {
+    background-color: #f7e1fc;
+      color: black;
+    font-size: 14px;
+    border-radius: 5px; 
+    padding: 20px
+  }
+</style>
+
+```{css echo=FALSE}
+.bordered{
+  border-style: solid;
+}
+```
+  
+<br>
+<div class = "lecture-box">
+  
+  Short lecture on methods to detect population structure.
+
+</div>
+  
+<br>
+  
+# Why R Markdown
+
+very nice overview: https://rmarkdown.rstudio.com/lesson-1.html
+
+![](images/rmd_example.png){width=600px}
+
+The above chunk of code makes the following document:
+
+
+<div class="bordered">
+![](images/rmd_rendered.png){width=600px}
+</div>
+
+
+
+## changing code block languange
+
+to finish all of this still
+
+
+
+
+
