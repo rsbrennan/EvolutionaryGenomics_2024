@@ -154,7 +154,7 @@ Can you make your list numbered instead? How do you think you would indent your 
 
 There are many, many other options. For example, you can add tables either directly or from a csv file. You can also embed images or links easily. We won't go through this now, but be aware that these are options that are useful. For instance, if you have an analysis that is slow to run, you might run this outside of your R Markdown document and add the resulting plot instead of executing it in the markdown document itself.
 
-Find a list of the common options here????? or ask chat GPT for help doing what you want to do.
+Find a list of the common options [here](https://www.markdownguide.org/cheat-sheet/) or ask chat GPT for help doing what you want to do.
 
 
 
