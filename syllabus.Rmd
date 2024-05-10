@@ -9,14 +9,15 @@ output:
   
 Instructors: 
   - Reid Brennan,rbrennan@geomar.de
-  - Jenny Nascimento- Schulze, 
+  - Jenny Nascimento-Schulze, jnascimento@geomar.de
 
-The course will take place 8:30-12:00 from May 13-24 in 8A-208. See the Schedule for full details.
+The course will take place 8:30-12:00 from May 13-24 in room 5-3.228 (except May 14, in room 8A-002). See the Schedule for full details.
 
 Course website: rsbrennan.github.io/EvolutionaryGenomics_2024
 
 ### Course introduction
 The goal of this course is to provide a theoretical and methodological foundation in population genomics. 
+
 We’re at an exciting time as evolutionary biologists. It is now fairly easy to generate huge amounts of sequence data, i.e., genomics. However, the analysis and understanding of these data are not trivial. The approach in this course will be to focus on the basics of evolutionary principles and apply these basics to current genomics data. We will start with data processing and quality control of typical sequence data and then cover methods to detect including population structure and selection. You should leave with practical with skills in both bioinformatic methods (unix, bash, R) as well as an understanding of population genetics.
 
 The first week we will work together through a [tutorial](https://rsbrennan.github.io/EvolutionaryGenomics_2024/tutorials.html) using a real dataset. The second week you will [analyze your own dataset.](https://rsbrennan.github.io/EvolutionaryGenomics_2024/project_overview.html)

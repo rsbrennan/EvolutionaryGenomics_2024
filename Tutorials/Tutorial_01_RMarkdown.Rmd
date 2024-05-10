@@ -51,7 +51,7 @@ For a general overview of R Markdown, see the [website here](https://rmarkdown.r
 
 ## What does Rmarkdown look like?
 
-To remind you, R Markdown is just plain text. The files end in `.Rmd`, but otherwise are just text files. Below is an example where we have three main parts. 
+R Markdown is plain text. The files end in `.Rmd`, but otherwise are just text files. Below is an example where we have three main parts. 
 
 1. Lines 1-4: Metadata telling how you'd like the document formatted
 2. Lines 5-9: Plain text
@@ -82,11 +82,11 @@ Hopefully you see something like this:
 ![](images/rmd-1.png){width=600px}
 </div>
 
-For your own analyses, you would change the r code within the code block. 
+For your own analyses, you would put your own r code within the code block. 
 
 ## Code block details
 
-There are more choices within code blocks. 
+There are many choices within code blocks. 
 
 For example, you can ask for the R code to be excluded from the rendered document by changing the first line to `{r, echo=FALSE}`. 
 
@@ -108,6 +108,18 @@ Why would we want to not run or show some code blocks?
 
 Note that we will be using both bash and R. You can change the language of the code chunk by changing `{r}` to `{bash}` or whatever other language. 
 
+<br>
+
+<div class="text-box">
+
+Change the language of your code block and re-knit. What happens?
+
+</div>
+
+<br>
+
+
+
 ## More markdown options
 
 You don't need to know a ton of details to make markdown work on its basic level. The more options you know, the "prettier" your documents might look. Below are a few major options, but there are many more that you can look up at ??????
@@ -115,6 +127,7 @@ You don't need to know a ton of details to make markdown work on its basic level
 ### headers
 
 headers are indicated by `#`. The highest level header (i.e., largest text and top level) are a single `#`. Additional `##` gives you the next levels down. For example:
+
 
 ```{eval=F}
 
@@ -124,16 +137,6 @@ headers are indicated by `#`. The highest level header (i.e., largest text and t
 
 ```
 
-<br>
-
-<div class="text-box">
-
-Add different headers to your document. 
-
-</div>
-
-<br>
-
 ### lists
 
 It can also be nice to make lists. These are made using `-` followed by text. 
@@ -142,9 +145,12 @@ It can also be nice to make lists. These are made using `-` followed by text.
 
 <div class="text-box">
 
-Add a list of a few lines to your document.
+Play around with the options you've just learned. 
 
-Can you make your list numbered instead? How do you think you would indent your list? Try this.
+- Add different headers to your document. 
+- Add text in between your headers. 
+- Add a list of a few lines to your document.
+- Can you make your list numbered instead?
 
 </div>
 
