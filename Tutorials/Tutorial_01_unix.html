@@ -1642,21 +1642,12 @@ div.tocify {
 <p><br><br><br></p>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>test changes</p>
 <p>This tutorial is from Keith Bradnam, and modified here to fit our
 file structure and cloudlab. See the original at: <a href="https://github.com/KorfLab/unix_and_perl" class="uri">https://github.com/KorfLab/unix_and_perl</a> . The original
 version is licensed under <a href="http://creativecommons.org/licenses/by/4.0/">CC 4.0</a>. I have
 made small changes so that the output shown is what you’ll see in
 cloudlab, but the bulk and the actual hard work is original from the
 prior source.</p>
-<p>This ‘bootcamp’ is intended to provide the reader with a basic
-overview of essential Unix/Linux commands that will allow them to
-navigate a file system and move, copy, edit files. It will also
-introduce a brief overview of some ‘power’ commands in Unix. It was
-orginally developed as part of a <a href="http://bioinformatics.ucdavis.edu">Bioinformatics Core</a>
-Workshop taught at UC Davis (<a href="http://training.bioinformatics.ucdavis.edu/docs/2015/06/june-2015-workshop/index.html">Using
-the Linux Command-Line for Analysis of High Throughput Sequence
-Data</a>).</p>
 </div>
 <div id="why-unix" class="section level2">
 <h2>Why Unix?</h2>
@@ -1892,9 +1883,9 @@ directory based on its <em>absolute</em> location. E.g. if you are
 working in the <code>/home/jovyan/Learning_unix</code> directory and you
 then want to change to the <code>/tmp</code> directory, then you could
 do either of the following:</p>
-<pre><code>jovyan@cloudlab:~/Learning_unix$ cd ../../../tmp/</code></pre>
+<pre><code>~/Learning_unix$ cd ../../../tmp/</code></pre>
 <p>or…</p>
-<pre><code>jovyan@cloudlab:~/Learning_unix$ cd /tmp</code></pre>
+<pre><code>~/Learning_unix$ cd /tmp</code></pre>
 <p>They both achieve the same thing, but the 2nd example requires that
 you know about the full <em>path</em> from the root level of the
 computer to your directory of interest (the ‘path’ is an important
@@ -2097,7 +2088,7 @@ save you a lot of typing.</p>
 command was a directory name (Temp). So we moved a file from its source
 location to a target location, but note that the target could have also
 been a (different) file name, rather than a directory. E.g. let’s make a
-new file and move it whilst renaming it at the same time:</p>
+new file and move it while renaming it at the same time:</p>
 <p><br></p>
 <div class="text-box">
 <p>In your <code>~/Learning_unix</code> directory, make a new file
@@ -2350,6 +2341,11 @@ a file based on a delimiter.</p>
 <code>^</code> matches patterns at the start of a line):</li>
 </ul>
 <div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;^ATG&quot;</span> file.txt</span></code></pre></div>
+<p><br></p>
+<div class="text-box">
+<p>Make sure you can run the above commands.</p>
+</div>
+<p><br></p>
 </div>
 
 

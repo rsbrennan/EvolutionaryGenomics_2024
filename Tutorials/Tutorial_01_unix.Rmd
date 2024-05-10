@@ -41,11 +41,7 @@ output:
 
 ## Introduction 
 
-test changes
-
 This tutorial is from Keith Bradnam, and modified here to fit our file structure and cloudlab. See the original at: https://github.com/KorfLab/unix_and_perl . The original version is licensed under [CC 4.0](http://creativecommons.org/licenses/by/4.0/). I have made small changes so that the output shown is what you'll see in cloudlab, but the bulk and the actual hard work is original from the prior source.
-
-This 'bootcamp' is intended to provide the reader with a basic overview of essential Unix/Linux commands that will allow them to navigate a file system and move, copy, edit files. It will also introduce a brief overview of some 'power' commands in Unix. It was orginally developed as part of a [Bioinformatics Core](http://bioinformatics.ucdavis.edu) Workshop taught at UC Davis ([Using the Linux Command-Line for Analysis of High Throughput Sequence Data](http://training.bioinformatics.ucdavis.edu/docs/2015/06/june-2015-workshop/index.html)).
 
 
 ## Why Unix?
@@ -306,11 +302,11 @@ What if you wanted to navigate up _two_ levels in the file system in one go? It'
 
 Using `cd ..` allows us to change directory _relative_ to where we are now. You can also always change to a directory based on its _absolute_ location. E.g. if you are working in the `/home/jovyan/Learning_unix` directory and you then want to change to the `/tmp` directory, then you could do either of the following:
 
-    jovyan@cloudlab:~/Learning_unix$ cd ../../../tmp/
+    ~/Learning_unix$ cd ../../../tmp/
 
 or...
 
-    jovyan@cloudlab:~/Learning_unix$ cd /tmp
+    ~/Learning_unix$ cd /tmp
 
 They both achieve the same thing, but the 2nd example requires that you know about the full _path_ from the root level of the computer to your directory of interest (the 'path' is an important concept in Unix). Sometimes it is quicker to change directories using the relative path, and other times it will be quicker to use the absolute path.
 
@@ -511,7 +507,7 @@ The asterisk `*` acts as a [wild-card character][], essentially meaning 'match a
 
 ## 17: Renaming files ##
 
-In the earlier example, the destination for the `mv` command was a directory name (Temp). So we moved a file from its source location to a target location, but note that the target could have also been a (different) file name, rather than a directory. E.g. let's make a new file and move it whilst renaming it at the same time:
+In the earlier example, the destination for the `mv` command was a directory name (Temp). So we moved a file from its source location to a target location, but note that the target could have also been a (different) file name, rather than a directory. E.g. let's make a new file and move it while renaming it at the same time:
 
 <br>
 
@@ -785,7 +781,15 @@ Combine your grep command from above with `wc -l` to count how many lines contai
 grep "^ATG" file.txt
 ```
 
+<br>
 
+<div class="text-box">
+
+Make sure you can run the above commands.
+
+</div>
+
+<br>
 
       
 
