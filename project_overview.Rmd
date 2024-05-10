@@ -42,7 +42,7 @@ Go the the following pages to get more info about the potential datasets:
 1. [Killifish along salinity gradients](./independent_project_files/dataset1_killifish.html)
 2. [Cod migration and population structure](./independent_project_files/dataset2_cod.html)
 3. [Scallop population structure](./independent_project_files/dataset3_scallops.html)
-4. [Grouper population structure and diversity](./independent_project_files/dataset4_grouper.html)
+4. [Lobster population structure](./independent_project_files/dataset4_lobster.html)
 
 You'll do this project in pairs. With your partner, look through the possible datasets and rank them in order of preference. We'll then have a class discussion to assign datasets. 
 
