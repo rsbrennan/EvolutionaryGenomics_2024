@@ -582,7 +582,25 @@ cat opening_lines.txt > file_copy.txt
 
 --- 
 
-## 24: Counting characters and lines in a file ##
+## 24: Viewing parts of files with head and tail  ##
+
+In some cases we might be interested in checking if their format is correct or if the file contains the expected information throughout its entirety. For this, we can use the [head][] command to print the first 10 lines of a file. Similarly, the [tail][] command prints the last 10 lines of the file. These commands are particularly useful when dealing with files with millions of lines or when viewing multiple files simultaneously.
+
+You would run the commands as follows:
+
+```bash 
+jovyan@cloudlab:~/Learning_unix$ head opening_lines.txt
+jovyan@cloudlab:~/Learning_unix$ tail opening_lines.txt
+
+```
+
+[head]: http://en.wikipedia.org/wiki/Head_(Unix)
+[tail]: http://en.wikipedia.org/wiki/Tail_(Unix)
+
+
+--- 
+
+## 25: Counting characters and lines in a file ##
 
 ```bash
 jovyan@cloudlab:~/Learning_unix$ ls
@@ -742,8 +760,6 @@ The following examples introduce some other Unix commands, and show how they cou
 
 + View the penultimate 10 lines of a file (using [head][] and [tail][] commands):
 
-[head]: http://en.wikipedia.org/wiki/Head_(Unix)
-[tail]: http://en.wikipedia.org/wiki/Tail_(Unix)
 
 ```bash
 tail -n 20 file.txt | head
