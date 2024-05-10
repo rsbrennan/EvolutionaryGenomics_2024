@@ -54,11 +54,15 @@ These data consist of RAD-sequencing 236 H. gammarus from 32 locations. Sequenci
 
 <br>
 
-- VCF: ``
-- Population file: ``
-- lat long for each collection site: ``
-- pairwise distances between populations: ``
+- VCF: `dataset_4.vcf`
+- lat long for each collection site: `dataset4_latLong.csv`
+- pairwise distances between populations: `dataset_4_pairwise_distances_df.csv`
+- Population details: `dataset_4_popmapdata.csv`
 - There is no phenotype data for these individuals.
+
+Population files:
+
+- we have also provided pop files for you, because this is a crazy number of populations. These are in `pop_files` and contain the actual populations as well as the larger region for each population. 
 
 
 
