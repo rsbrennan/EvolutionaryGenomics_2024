@@ -1,6 +1,6 @@
 Class_day,Date,Day,Topic,Tutorial_link,Lecture_slides,Other,Location
 1,13.05.24,Monday,"Course structure and intro, Tutorial 1: unix/cloudlab",[Cloudlab](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/cloudlab.html); [Unix](https://rsbrennan.github.io/EvolutionaryGenomics_2023/Tutorials/Tutorial_01_unix.html),[Lecture 1](https://rsbrennan.github.io/EvolutionaryGenomics_2023/lectures/Lecture_01.pdf),,5-3.228
-2,14.05.24,Tuesday,Tutorial 2: Processing raw data,[Tutorial 2](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_02_RAW_data.html),,,8A-002
+2,14.05.24,Tuesday,Tutorial 2: Processing raw data,[Tutorial 2](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_02_RAW_data.html),,,5-1.501
 3,15.05.24,Wednesday,Tutorial 3: Working with SNPs,[Tutorial 3](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_03_SNP_data.html),,,5-3.228
 4,16.05.24,Thursday,Tutorial 4: Population Structure,[Tutorial 4](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_04_Population_structure.html),,[Multiple testing example](https://rsbrennan.github.io/EvolutionaryGenomics/misc/multiple_testing.html),5-3.228
 5,17.05.24,Friday,Tutorial 5: Selection,[Tutorial 5](https://rsbrennan.github.io/EvolutionaryGenomics_2024/Tutorials/Tutorial_05_selection.html),,,5-3.228
