@@ -1883,9 +1883,9 @@ directory based on its <em>absolute</em> location. E.g. if you are
 working in the <code>/home/jovyan/Learning_unix</code> directory and you
 then want to change to the <code>/tmp</code> directory, then you could
 do either of the following:</p>
-<pre><code>~/Learning_unix$ cd ../../../tmp/</code></pre>
+<pre><code>cd ../../../tmp/</code></pre>
 <p>or…</p>
-<pre><code>~/Learning_unix$ cd /tmp</code></pre>
+<pre><code>cd /tmp</code></pre>
 <p>They both achieve the same thing, but the 2nd example requires that
 you know about the full <em>path</em> from the root level of the
 computer to your directory of interest (the ‘path’ is an important
@@ -1904,8 +1904,7 @@ a home directory</a>.</p>
 <p><br></p>
 <div class="text-box">
 <p>See what happens when you try the following commands (use the
-<code>pwd</code> command after each one to confirm the results if
-necessary):</p>
+<code>pwd</code> command after each one to confirm the results):</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> / </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~ </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span></span></code></pre></div>
@@ -1921,8 +1920,8 @@ subdirectories of your home directory when your current directory is
 somewhere else. I.e. the quickest way of navigating from the root
 directory to your <code>Learning_unix</code> directory is as
 follows:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">jovyan@cloudlab:~$</span> cd /</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jovyan@cloudlab:/$</span> cd ~/Learning_unix</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Learning_unix</span></code></pre></div>
 <hr />
 <p>##11: Making the <code>ls</code> command more useful ##</p>
 <p>Time to learn another useful command-line option. If you add the
@@ -1930,9 +1929,6 @@ letter ‘l’ to the <code>ls</code> command it will give you a longer
 output compared to the default:</p>
 <p><br></p>
 <div class="text-box">
-<p>See what happens when you try the following commands (use the
-<code>pwd</code> command after each one to confirm the results if
-necessary):</p>
 <p>move to your home directory.</p>
 <p>enter <code>ls -l</code></p>
 </div>
@@ -1945,19 +1941,18 @@ different options for the <code>ls</code> command. Try out the following
 changes.</p>
 <p><br></p>
 <div class="text-box">
-<p>See what happens when you try the following commands:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-r</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-t</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> <span class="at">-t</span> <span class="at">-r</span> </span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-ltr</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span></span></code></pre></div>
+<p>Add various combinations of the options <code>l</code>,
+<code>r</code>, <code>t</code>, <code>h</code> to your ls command. Note
+that you only need one <code>-</code> so you can enter
+<code>ls -lr</code> for example.</p>
+<p>What are each of these doing?</p>
 </div>
 <p><br></p>
 <p>Note that the last examples combine multiple options but only use one
 dash. This is a very common way of specifying multiple command-line
-options. You may be wondering what some of these options are doing. It’s
-time to learn about Unix documentation….</p>
+options. Trial and error is a good way to figure out what things do, but
+there are easier, faster, and likely safer ways. It’s time to learn
+about Unix documentation….</p>
 <hr />
 </div>
 <div id="man-pages" class="section level2">
@@ -1968,9 +1963,9 @@ command has an associated ‘manual’ that you can access by using the
 <code>man</code> command. E.g.</p>
 <p><br></p>
 <div class="text-box">
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">man</span> ls </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">man</span> cd</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">man</span> man <span class="co"># yes even the man command has a manual page</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">man</span> ls </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">man</span> cd</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">man</span> man <span class="co"># yes even the man command has a manual page</span></span></code></pre></div>
 </div>
 <p><br></p>
 <p>When you are using the man command, press <code>space</code> to
@@ -1982,18 +1977,17 @@ viewer called <code>less</code>, which we’ll come to later on.</p>
 </div>
 <div id="removing-directories" class="section level2">
 <h2>13: Removing directories</h2>
-<p>We now have a few (empty) directories that we should remove. To do
-this use the <a href="http://en.wikipedia.org/wiki/Rmdir">rmdir</a>
-command, this will only remove empty directories so it is quite safe to
-use. If you want to know more about this command (or any Unix command),
-then remember that you can just look at its man page.</p>
+<p>We now have a few (empty) directories that we should remove.</p>
+<p>To do this use the <a href="http://en.wikipedia.org/wiki/Rmdir">rmdir</a> command, this will
+only remove empty directories so it is quite safe to use. If you want to
+know more about this command (or any Unix command), then remember that
+you can just look at its man page.</p>
 <p><br></p>
 <div class="text-box">
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Learning_unix/Outer_directory/</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">rmdir</span> Inner_directory/</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ..</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">~/Learning_unix$</span> </span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">~/Learning_unix$</span> ls</span></code></pre></div>
+<p>Move into <code>~/Learning_unix/Outer_directory/</code> and remove
+<code>Inner_directory</code>.</p>
+<p>Verify that you have removed this directory.</p>
+<p>Remove <code>Outer_directory</code></p>
 </div>
 <p><br></p>
 <p>*** Note, you have to be outside a directory before you can remove it
@@ -2045,10 +2039,10 @@ will let us create a new, empty file. The touch command does other
 things too, but for now we just want a couple of files to work with.</p>
 <p><br></p>
 <div class="text-box">
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> Learning_unix/</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> heaven.txt</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> earth.txt</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> Learning_unix/</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> heaven.txt</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> earth.txt</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span></span></code></pre></div>
 </div>
 <p><br></p>
 <hr />
@@ -2070,9 +2064,9 @@ to use tab completion:</p>
 file (or directory) that we want to move, and then specify a target
 location. If we had wanted to we could have moved both files in one go
 by typing any of the following commands:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="pp">*</span>.txt Temp/ </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="pp">*</span>t Temp/ </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="pp">*</span>ea<span class="pp">*</span> Temp/</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="pp">*</span>.txt Temp/ </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="pp">*</span>t Temp/ </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="pp">*</span>ea<span class="pp">*</span> Temp/</span></code></pre></div>
 <p>The asterisk <code>*</code> acts as a <a href="http://en.wikipedia.org/wiki/Wildcard_character">wild-card
 character</a>, essentially meaning ‘match anything’. The second example
 works because there are no other files or directories in the directory
@@ -2172,8 +2166,8 @@ directory using <code>cp ~/file3 ~/Learning_unix</code></p>
 moved.</p>
 <p>Alternatively, you could have moved to <code>~Learning_unix</code>
 first and then copied <code>file3</code> using
-<code>cp ~/file3 .</code>. Delete <code>file3</code> and try this second
-approach now.</p>
+<code>cp ~/file3 .</code>.</p>
+<p>Delete <code>file3</code> and try this second approach now.</p>
 </div>
 <p><br></p>
 <p>This last step introduces another new concept. In Unix, the current
@@ -2183,14 +2177,11 @@ that you are in.</p>
 <p><br></p>
 <div class="text-box">
 <p>Compare the following:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> . </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> ./</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> . </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> ./</span></code></pre></div>
 </div>
 <p><br></p>
-<p>In this case, using the dot is somewhat pointless because
-<code>ls</code> will already list the contents of the current directory
-by default. Also note how the trailing slash is optional.</p>
 <hr />
 </div>
 <div id="viewing-files-with-less" class="section level2">
@@ -2222,8 +2213,8 @@ overwrite any existing file of the same name</em></strong></p>
 <p><br></p>
 <div class="text-box">
 <p>Let’s add another line to the file:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;The primroses were over.&quot;</span> <span class="op">&gt;&gt;</span> opening_lines.txt</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> opening_lines.txt</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;The primroses were over.&quot;</span> <span class="op">&gt;&gt;</span> opening_lines.txt</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> opening_lines.txt</span></code></pre></div>
 </div>
 <p><br></p>
 <p>Notice that we use <code>&gt;&gt;</code> and not just
@@ -2236,7 +2227,7 @@ view that text (or what you do with it). It is a very simple, but
 sometimes useful, command. You can use <code>cat</code> to quickly
 combine multiple files or, if you wanted to, make a copy of an existing
 file:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> opening_lines.txt <span class="op">&gt;</span> file_copy.txt</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> opening_lines.txt <span class="op">&gt;</span> file_copy.txt</span></code></pre></div>
 <hr />
 </div>
 <div id="counting-characters-and-lines-in-a-file" class="section level2">
@@ -2248,9 +2239,9 @@ to give you just one of those statistics (in this case we count lines
 with <code>wc -l</code>).</p>
 <p><br></p>
 <div class="text-box">
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> opening_lines.txt</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> opening_lines.txt</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> opening_lines.txt</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">wc</span> <span class="at">-l</span> opening_lines.txt</span></code></pre></div>
 </div>
 <p><br></p>
 <hr />
@@ -2314,10 +2305,10 @@ there any missing all’s?</li>
 output from one command or program to any other command (as long as the
 second commmand accepts input of some sort). We do this by using what is
 known as a <a href="http://en.wikipedia.org/wiki/Pipe_(Unix)">pipe</a>.
-This is implemented using the ‘|’ character (which is a character which
-always seems to be on different keys depending on the keyboard that you
-are using). Think of the pipe as simply connecting two Unix programs.
-Here’s an example which introduces some new Unix commands:</p>
+This is implemented using the <code>|</code> character (which is a
+character which always seems to be on different keys depending on the
+keyboard that you are using). Think of the pipe as simply connecting two
+Unix programs</p>
 <p><br></p>
 <div class="text-box">
 <p>Combine your grep command from above with <code>wc -l</code> to count
@@ -2333,14 +2324,17 @@ it!</em></strong></p>
 </div>
 <div id="other-useful-commands" class="section level1">
 <h1>Other useful commands:</h1>
-<p><code>head</code>: view first 10 lines of a file <code>tail</code>:
-view last 10 lines of a file <code>cut</code>: cut out certain column of
-a file based on a delimiter.</p>
 <ul>
-<li>Show lines of a file that begin with a start codon (ATG) (the
-<code>^</code> matches patterns at the start of a line):</li>
+<li><p><code>head</code>: view first 10 lines of a file<br />
+</p></li>
+<li><p><code>tail</code>: view last 10 lines of a file<br />
+</p></li>
+<li><p><code>cut</code>: cut out certain column of a file based on a
+delimiter.</p></li>
+<li><p>Show lines of a file that begin with a start codon (ATG) (the
+<code>^</code> matches patterns at the start of a line):</p></li>
 </ul>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;^ATG&quot;</span> file.txt</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;^ATG&quot;</span> file.txt</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
 <p>Make sure you can run the above commands.</p>

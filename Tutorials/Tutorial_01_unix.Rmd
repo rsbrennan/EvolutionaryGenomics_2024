@@ -302,11 +302,11 @@ What if you wanted to navigate up _two_ levels in the file system in one go? It'
 
 Using `cd ..` allows us to change directory _relative_ to where we are now. You can also always change to a directory based on its _absolute_ location. E.g. if you are working in the `/home/jovyan/Learning_unix` directory and you then want to change to the `/tmp` directory, then you could do either of the following:
 
-    ~/Learning_unix$ cd ../../../tmp/
+    cd ../../../tmp/
 
 or...
 
-    ~/Learning_unix$ cd /tmp
+    cd /tmp
 
 They both achieve the same thing, but the 2nd example requires that you know about the full _path_ from the root level of the computer to your directory of interest (the 'path' is an important concept in Unix). Sometimes it is quicker to change directories using the relative path, and other times it will be quicker to use the absolute path.
 
@@ -320,13 +320,14 @@ Remember that the command prompt shows you the name of the directory that you ar
 
 <div class="text-box">
 
-See what happens when you try the following commands (use the `pwd` command after each one to confirm the results if necessary):
+See what happens when you try the following commands (use the `pwd` command after each one to confirm the results):
 
 ```bash
 cd / 
 cd ~ 
 cd
 ```
+
 </div>
 
 <br>
@@ -337,8 +338,8 @@ Hopefully, you should find that `cd` and `cd ~` do the same thing, i.e. they tak
 You can also use the `~` as a quick way of navigating into subdirectories of your home directory when your current directory is somewhere else. I.e. the quickest way of navigating from the root directory to your `Learning_unix` directory is as follows:
 
 ```bash
-jovyan@cloudlab:~$ cd /
-jovyan@cloudlab:/$ cd ~/Learning_unix
+cd /
+cd ~/Learning_unix
 ```
 [home directory]: http://en.wikipedia.org/wiki/Tilde#Directories_and_URLs
 
@@ -351,8 +352,6 @@ Time to learn another useful command-line option. If you add the letter 'l' to t
 <br>
 
 <div class="text-box">
-
-See what happens when you try the following commands (use the `pwd` command after each one to confirm the results if necessary):
 
 move to  your home directory. 
 
@@ -368,22 +367,16 @@ For each file or directory we now see more information (including file ownership
 
 <div class="text-box">
 
-See what happens when you try the following commands:
+Add various combinations of the options `l`, `r`, `t`, `h` to your ls command. Note that you only need one `-` so you can enter `ls -lr` for example. 
 
-```bash
-ls -l 
-ls -r
-ls -t
-ls -l -t -r 
-ls -ltr
-ls -lh
-```
+What are each of these doing?
+
 </div>
 
 <br>
 
 
-Note that the last examples combine multiple options but only use one dash. This is a very common way of specifying multiple command-line options. You may be wondering what some of these options are doing. It's time to learn about Unix documentation....
+Note that the last examples combine multiple options but only use one dash. This is a very common way of specifying multiple command-line options. Trial and error is a good way to figure out what things do, but there are easier, faster, and likely safer ways. It's time to learn about Unix documentation....
 
 ---
 
@@ -411,19 +404,21 @@ When you are using the man command, press `space` to scroll down a page, `b` to 
 
 ## 13: Removing directories ##
 
-We now have a few (empty) directories that we should remove. To do this use the [rmdir][] command, this will only remove empty directories so it is quite safe to use. If you want to know more about this command (or any Unix command), then remember that you can just look at its man page.
+We now have a few (empty) directories that we should remove. 
+
+To do this use the [rmdir][] command, this will only remove empty directories so it is quite safe to use. If you want to know more about this command (or any Unix command), then remember that you can just look at its man page.
 
 <br>
 
 <div class="text-box">
 
-```bash
-cd ~/Learning_unix/Outer_directory/
- rmdir Inner_directory/
-cd ..
-~/Learning_unix$ 
-~/Learning_unix$ ls
-```
+Move into `~/Learning_unix/Outer_directory/` and remove `Inner_directory`.
+
+Verify that you have removed this directory. 
+
+Remove `Outer_directory`
+
+
 </div>
 
 <br>
@@ -588,7 +583,9 @@ Copy `file3` into your `~/Learning_unix` directory using `cp ~/file3 ~/Learning_
 
 Move to `~/Learning_unix` and make sure this file moved.
 
-Alternatively, you could have moved to `~Learning_unix` first and then copied `file3` using `cp ~/file3 .`. Delete `file3` and try this second approach now.
+Alternatively, you could have moved to `~Learning_unix` first and then copied `file3` using `cp ~/file3 .`. 
+
+Delete `file3` and try this second approach now.
 
 </div>
 
@@ -613,8 +610,6 @@ ls ./
 
 <br>
 
-
-In this case, using the dot is somewhat pointless because `ls` will already list the contents of the current directory by default. Also note how the trailing slash is optional. 
 
 [cp]: http://en.wikipedia.org/wiki/Cp_(Unix)
 
@@ -747,7 +742,7 @@ You will often want to search files to find lines that match a certain pattern. 
 
 ## 28: Combining Unix commands with pipes ##
 
-One of the most poweful features of Unix is that you can send the output from one command or program to any other command (as long as the second commmand accepts input of some sort). We do this by using what is known as a [pipe][]. This is implemented using the '|' character (which is a character which always seems to be on different keys depending on the keyboard that you are using). Think of the pipe as simply connecting two Unix programs. Here's an example which introduces some new Unix commands:
+One of the most poweful features of Unix is that you can send the output from one command or program to any other command (as long as the second commmand accepts input of some sort). We do this by using what is known as a [pipe][]. This is implemented using the `|` character (which is a character which always seems to be on different keys depending on the keyboard that you are using). Think of the pipe as simply connecting two Unix programs
 
 <br>
 
@@ -770,9 +765,9 @@ Combine your grep command from above with `wc -l` to count how many lines contai
 
 # Other useful commands:
 
-`head`: view first 10 lines of a file
-`tail`: view last 10 lines of a file
-`cut`: cut out certain column of a file based on a delimiter.
+- `head`: view first 10 lines of a file  
+- `tail`: view last 10 lines of a file  
+- `cut`: cut out certain column of a file based on a delimiter.  
 
 
 + Show lines of a file that begin with a start codon (ATG) (the `^` matches patterns at the start of a line):
