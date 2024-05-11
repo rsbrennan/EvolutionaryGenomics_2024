@@ -31,11 +31,7 @@ We're going to be doing our analyses on cloudlab, hosted by CAU. Cloudlab is sup
 
 You should all have access to cloudlab at the following link via OLAT:
 
-https://lms.uni-kiel.de/auth/RepositoryEntry/5309268072/CourseNode/107413362968797
-
-or
-
-https://lms.uni-kiel.de/url/RepositoryEntry/5309268072
+https://lms.uni-kiel.de/auth/RepositoryEntry/5451644982/CourseNode/109531948798168
 
 You will be asked to login via OLAT. After this you should see the following screen.
 
