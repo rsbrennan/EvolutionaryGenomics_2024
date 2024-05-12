@@ -345,7 +345,7 @@ cd ~/Learning_unix
 
 ---
 
-##11: Making the `ls` command more useful ##
+## 11: Making the `ls` command more useful ##
 
 Time to learn another useful command-line option. If you add the letter 'l' to the `ls` command it will give you a longer output compared to the default:
 
@@ -522,7 +522,7 @@ In this example we create a new file ('rags') and move it to a new location and 
 
 ---
     
-## 19: Removing files ##
+## 18: Removing files ##
 
 You've seen how to remove a directory with the `rmdir` command, but `rmdir` won't remove directories if they contain any files. So how can we remove the files we have created (inside `Learning_Unix/Temp`)? In order to do this, we will have to use the [rm][] (remove) command.
 
@@ -553,7 +553,7 @@ We could have simplified this step by using a wild-card (e.g. `rm -i *.txt`) or 
 
 ---
 
-## 20: Copying files ##
+## 19: Copying files ##
 
 Copying files with the [cp][] (copy) command is very similar to moving them. Remember to always specify a source and a target location. Let's create a new file and make a copy of it:
 
@@ -615,7 +615,7 @@ ls ./
 
 ---
 
-## 22: Viewing files with less ##
+## 20: Viewing files with less ##
 
 So far we have covered listing the contents of directories and moving/copying/deleting either files and/or directories. Now we will quickly cover how you can look at files. The [less][less command] command lets you view (but not edit) text files.
 
@@ -639,7 +639,7 @@ On its own, `echo` isn't a very exciting Unix command. It just echoes text back 
 
 ---
 
-## 23: Viewing files with cat  ##
+## 21: Viewing files with cat  ##
 
 <br>
 
@@ -667,7 +667,7 @@ cat opening_lines.txt > file_copy.txt
 
 --- 
 
-## 24: Counting characters and lines in a file ##
+## 22: Counting characters and lines in a file ##
 
 Using Unix's [wc][wc command] command (word count), we can count how many lines, words, and characters are in a specified file (or files), but you can use command-line options to give you just one of those statistics (in this case we count lines with `wc -l`).
 
@@ -691,7 +691,7 @@ wc -l opening_lines.txt
 ---
 
 
-## 27: Matching lines in files with grep ##
+## 23: Matching lines in files with grep ##
 
 Open the launcher tab and make a new textfile (i.e., click the text file button to open a new window) to paste the following lines to your file:
 
@@ -740,7 +740,7 @@ You will often want to search files to find lines that match a certain pattern. 
 
 ---
 
-## 28: Combining Unix commands with pipes ##
+## 24: Combining Unix commands with pipes ##
 
 One of the most poweful features of Unix is that you can send the output from one command or program to any other command (as long as the second commmand accepts input of some sort). We do this by using what is known as a [pipe][]. This is implemented using the `|` character (which is a character which always seems to be on different keys depending on the keyboard that you are using). Think of the pipe as simply connecting two Unix programs
 
