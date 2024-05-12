@@ -1744,7 +1744,8 @@ that are likely multi-mapping or similar.</li>
 </ul>
 <p>Let’s now look at a few quality controls in our vcf file.</p>
 <p>Note that I relied on a few existing tutorials to help build this
-exercise:</p>
+exercise. These are generally excellent resources to help guide
+filtering decisions.</p>
 <ul>
 <li><a href="https://speciationgenomics.github.io/filtering_vcfs/" class="uri">https://speciationgenomics.github.io/filtering_vcfs/</a></li>
 <li><a href="https://www.ddocent.com/filtering/" class="uri">https://www.ddocent.com/filtering/</a></li>
@@ -1838,12 +1839,13 @@ position.</p>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;pos&quot;</span>, <span class="st">&quot;mean_depth&quot;</span>, <span class="st">&quot;variance_depth&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot with ggplot</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_depth, <span class="fu">aes</span>(mean_depth)) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>p </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># use summary to summarize the output</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_depth<span class="sc">$</span>mean_depth)</span></code></pre></div>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_depth, <span class="fu">aes</span>(mean_depth)) <span class="sc">+</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">theme_classic</span>()</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># use summary to summarize the output</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_depth<span class="sc">$</span>mean_depth)</span></code></pre></div>
 </div>
 <div id="variant-missingness" class="section level3">
 <h3>variant missingness</h3>
@@ -1851,11 +1853,12 @@ position.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>variant_miss <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.lmiss&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;chr&quot;</span>, <span class="st">&quot;pos&quot;</span>, <span class="st">&quot;nchr&quot;</span>, <span class="st">&quot;nfiltered&quot;</span>, <span class="st">&quot;nmiss&quot;</span>, <span class="st">&quot;fmiss&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_miss, <span class="fu">aes</span>(fmiss)) <span class="sc">+</span> <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>p </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_miss<span class="sc">$</span>fmiss)</span></code></pre></div>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(variant_miss, <span class="fu">aes</span>(fmiss)) <span class="sc">+</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(variant_miss<span class="sc">$</span>fmiss)</span></code></pre></div>
 <p><br> <br></p>
 </div>
 </div>
@@ -1867,21 +1870,23 @@ position.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>indiv_depth <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.idepth&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;ind&quot;</span>, <span class="st">&quot;nsites&quot;</span>, <span class="st">&quot;depth&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_depth, <span class="fu">aes</span>(depth)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>p </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(indiv_depth<span class="sc">$</span>depth)</span></code></pre></div>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_depth, <span class="fu">aes</span>(depth)) <span class="sc">+</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(indiv_depth<span class="sc">$</span>depth)</span></code></pre></div>
 </div>
 <div id="individual-missing-data" class="section level3">
 <h3>Individual missing data</h3>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>indiv_miss  <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">&quot;~/my_materials/filtering/variants.imiss&quot;</span>, <span class="at">delim =</span> <span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>,</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;ind&quot;</span>, <span class="st">&quot;ndata&quot;</span>, <span class="st">&quot;nfiltered&quot;</span>, <span class="st">&quot;nmiss&quot;</span>, <span class="st">&quot;fmiss&quot;</span>), <span class="at">skip =</span> <span class="dv">1</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_miss, <span class="fu">aes</span>(fmiss)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>p </span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(indiv_miss<span class="sc">$</span>fmiss)</span></code></pre></div>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(indiv_miss, <span class="fu">aes</span>(fmiss)) <span class="sc">+</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">&quot;dodgerblue1&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_classic</span>()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>p </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(indiv_miss<span class="sc">$</span>fmiss)</span></code></pre></div>
 </div>
 </div>
 <div id="filtering-vcf" class="section level2">
@@ -1905,11 +1910,20 @@ new vcf file. And you choose the name of your filtered vcf with the
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">--out</span> filtered_vcf</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
-<p>Change a few parameters and filter your vcf.</p>
-<p>How does this change the number of SNPs you have?</p>
-<p>What filtering options make you lost the highest number of SNPs?</p>
-<p>Which parameters do you think are most important?</p>
-<p>How do we balance filtering and retaining informative SNPs?</p>
+<ul>
+<li>Make some decisions for setting your parameters and filter your vcf.
+Do this with a partner.</li>
+<li>Count how many SNPs you have.</li>
+<li>Change some of your parameters and refilter -&gt; How does this
+change the number of SNPs you have?</li>
+</ul>
+<p>To dicuss as a class:</p>
+<ul>
+<li>What filtering options make you lose the highest number of
+SNPs?</li>
+<li>Which parameters do you think are most important?</li>
+<li>How do we balance filtering and retaining informative SNPs?</li>
+</ul>
 </div>
 <p><br></p>
 </div>

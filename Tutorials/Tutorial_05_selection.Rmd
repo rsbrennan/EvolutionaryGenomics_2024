@@ -132,7 +132,7 @@ How would we identify outliers?
 <br>
 
 
-#### Smoothed average
+### Smoothed average
 
 And we can add a smoothed average to get broad patterns across the genome.
 
@@ -141,7 +141,7 @@ And we can add a smoothed average to get broad patterns across the genome.
 chr1 <- calc_smoothed_averages(x = my.dat, 
                               facets = "pop.CHROM",
                                sigma = 50, # using a window size of 50 kb
-                               step = 25) # using a step size of 10kb between windows
+                               step = 10) # using a step size of 10kb between windows
 
 # pull out the smoothed values
 fst_smooth <- get.snpR.stats(chr1, facets = "pop.CHROM", stats ="fst")$pairwise.window
@@ -169,13 +169,12 @@ Are there any genomic regions that appear to be under selection?
 
 <br>
 
-#### "Classic" manhattan plot
+### "Classic" manhattan plot
 
 Our previous plot was only one chromosome. We might want to plot all our chromosomes. We can use the [qqman](https://github.com/stephenturner/qqman) package to do this. This might be useful for some of you in your projects later.
 
 ```{r, eval=F}
 
-install.packages("qqman")
 library(qqman)
 
 # subset data to just one comparison:
@@ -189,7 +188,7 @@ qqdf <- data.frame(SNP = HP_PC$ID,
                    P = HP_PC$fst
 )
 # make the manhattan plot
-manhattan(qqdf,logp = FALSE, ylim=c(0,1))
+manhattan(qqdf,logp = FALSE, ylim=c(0,1), ylab="Fst")
 
 
 ```
@@ -326,41 +325,29 @@ Talk about what outflank is doing.
 
 <br>
 
-
-Now we can pull out the outliers
+Now we can pull out the outliers.
 
 ```{r, eval=F}
-
-sum(OF$results$OutlierFlag == TRUE, na.rm=TRUE)
 
 P1 <- pOutlierFinderChiSqNoCorr(fst,Fstbar=OF$FSTNoCorrbar,
                                 dfInferred=OF$dfInferred,qthreshold=0.05,Hmin=0.1)
 
-outliers <- which(P1$OutlierFlag ==TRUE) #which of the SNPs are outliers? Note that this only returns the index
+outliers <- P1$LocusName[which(P1$OutlierFlag ==TRUE)] #which of the SNPs are outliers? Note that this only returns the index
 length(outliers)
-
-# note that we're ignoring loci with heterozygosity below 0.1, because outflank ignores these.
-plot(P1$indexOrder[P1$He>0.1], P1$FST[P1$He>0.1],
-     xlab="Position", ylab="FST", col=rgb(0,0,0,0.2))
-points(P1$indexOrder[outliers], P1$FST[outliers], col="magenta", pch=20)  
 
 ```
 
-But you should notice that our plot doesn't show chromsosomes. Let's go back to our manhattan plot with qqman and make this look better:
+Now we can make a manhattan plot:
 
 ```{r, eval=F}
 
 # make a new dataframe that fits the qqman requirements:
 ##
-qqdf <- data.frame(SNP = fst$ID,
+qqdf <- data.frame(SNP = HP_PC$ID,
                    CHR = as.numeric(substr(HP_PC$CHROM, 4,4)),
                    BP = HP_PC$position,
                    P = HP_PC$fst)
 )
-
-# pull out locus names for the outliers, so we can highlight
-outliers <- P1$LocusName[which(P1$OutlierFlag==TRUE)] #which of the SNPs are outliers?
-
 # make the manhattan plot
 manhattan(qqdf,logp = FALSE, ylim=c(0,1), highlight = outliers)
 
@@ -368,7 +355,6 @@ manhattan(qqdf,logp = FALSE, ylim=c(0,1), highlight = outliers)
 ```
 
 We could also look at our outlier regions more closely:
-
 
 ```{r, eval=F}
 

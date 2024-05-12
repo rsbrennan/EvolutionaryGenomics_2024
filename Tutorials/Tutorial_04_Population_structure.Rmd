@@ -48,7 +48,7 @@ It is usually interesting to understand the genetic diversity of your population
 
 We will calculate Pi for our populations (remember from lecture..). There are numerous way we could do this, but we will use vcftools. One important thing to note about this method is that it assumes all sites not in our vcf file are invariant. That is, there is an assumption that we have sequenced the whole genome, which is not true in our case. For all methods that estimate pi, it is very important that you know how your vcf is being handled and invariant sites are considered. 
 
-We will use 50kb windows to calculate pi. You could alter this window size and it would change your results. We're using a windowed approach because 1. per site estimates are noisy; 2. We are generally interested in the whole genome pi, which a large window will estimate well; 3. It produces less output so is easier to deal with.
+We will use 50kb windows to calculate pi. You could alter this window size and it would change your results. We're using a windowed approach because 1. per site estimates are noisy; 2. here we are interested in the whole genome pi, which a large window will estimate well; 3. It produces less output so is easier to deal with. Note that local pi estimates can be used to detect signals of selection, which we will discuss later. 
 
 We can first make a new directory where we will analyze our population structure data: 
   
@@ -56,17 +56,49 @@ We can first make a new directory where we will analyze our population structure
   
   ```{bash, eval=FALSE}
 VCF=~/shared_materials/tutorial_files/variants.vcf
+```
 
-# under ~/my_materials
-mkdir diversity
+make a new directory `diversity` under `~my_materials`. Move to this directory
 
-cd diversity
+We can estimate pi using vcftools as follows:
+
+```bash
+
+vcftools --vcf $VCF \
+--keep ~/shared_materials/tutorial_files/$pop.pop \
+--window-pi 50000 \
+--out $outputFile
 
 ```
 
-In the loop below, we will estimate pi for each population.
+The key here is we don't want to run our pi estimate on all samples in our dataset, but only on individuals from within one population (or however we want to categorize individuals). 
+
+In the `tutorial_files` directory there are pre-made files that end in `.pop`. These contain the individuals in the vcf that belong to each population. 
+
+<br>
+
+<div class="text-box">
+
+- Pick a population and run the pi command above, filling in the `keep` and `out` options to match with your population.
+- Look at your output file.
+
+We could manually run this command for each population. But are there better options to make this easier?
+
+</div>
+
+<br>
+
+
+Writing your first loop!
+
+<br>
+
+<div class="text-box">
+
+We will walk through writing a loop.
 
 ```{bash, eval=F}
+
 for pop in TR PC BC HP GA;
 do
 
@@ -79,21 +111,11 @@ done
 
 ```
 
-<br>
-
-This loop is saying, for each of our population id's (`TR PC BC HP PL GA`), do the following. Where we have `${pop}` in the loop, the population id of that step is inserted. First, `TR`, then `PC`, and so on. The `--keep` option is telling vcftools which individuals to keep (specified in a text file), `window-pi` allows us to set the window size and tell vcftools to calculate pi, and the `--out` option is our output filename. 
-
-<br>
-
-<div class="text-box">
-
-Run the loop above. 
-
-Look at your results and we will discuss together.
-
 </div>
 
 <br>
+
+This loop is saying, for each of our population id's (`TR PC BC HP PL GA`), do the following. Where we have `${pop}` in the loop, the population id of that step is inserted. First, `TR`, then `PC`, and so on. The `--keep` option is telling vcftools which individuals to keep (specified in a text file), `window-pi` allows us to set the window size and tell vcftools to calculate pi, and the `--out` option is our output filename. 
 
 
 #### processing output
@@ -145,6 +167,13 @@ meltdat <- bind_rows(d, .id="id")
 
 How would you check that your `bind_rows` function worked correctly and your final dataframe is complete?
 
+```{r, eval=F}
+
+map_int(d, nrow)
+
+```
+
+
 </div>
 
 <br>
@@ -177,6 +206,8 @@ meltdat %>%
 Do you think there are differences in pi between the populations?  
 
 How might you add more confidence to your conclusion?
+
+- `ks.test()`
 
 What effect do you think window size has on your estimates? Go back and change this value to see what happens.
 
@@ -370,15 +401,23 @@ What are sensible values of K to run?
 <br>
 
 
-We could just copy the code above for multiple K's, but this can be done more elegantly below:
+We could just copy the code above for multiple K's, but remember your loops! 
 
+<br>
   
+<div class = "text-box">
+
+Write a loop to iterate over your k values.
+
 ```{bash, eval=F}
 
 for K in 1 2 3 4 5; \
 do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
 
 ```
+</div>
+
+<br>
 
 and we need to grab the cross validation scores, to determine the most likely K:
 
@@ -461,10 +500,10 @@ Stop, and we will discuss this result
 <br>
 
 
+#### Determining your most likely K
+
 ```{r, eval=F}
 
-
-# plot all k values.
 p <-  ggplot(all_data,aes(x=sample,y=value,fill=factor(Q))) + 
   geom_bar(stat="identity",position="stack") +
   geom_rug(aes(x=sample, color=population), inherit.aes=F) +

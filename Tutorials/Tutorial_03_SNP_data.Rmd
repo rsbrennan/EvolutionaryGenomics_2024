@@ -155,7 +155,7 @@ Filtering is complicated and arbitrary. Generally, you need to consider the foll
 
 Let's now look at a few quality controls in our vcf file.
 
-Note that I relied on a few existing tutorials to help build this exercise:  
+Note that I relied on a few existing tutorials to help build this exercise. These are generally excellent resources to help guide filtering decisions.  
 
 - https://speciationgenomics.github.io/filtering_vcfs/
 - https://www.ddocent.com/filtering/ 
@@ -279,8 +279,9 @@ variant_depth <- read_delim("~/my_materials/filtering/variants.ldepth.mean", del
                             col_names = c("chr", "pos", "mean_depth", "variance_depth"), skip = 1)
 
 # plot with ggplot
-p <- ggplot(variant_depth, aes(mean_depth)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
-  theme_classic()
+p <- ggplot(variant_depth, aes(mean_depth)) + 
+       geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+       theme_classic()
 p 
 
 # use summary to summarize the output
@@ -296,8 +297,9 @@ Next, we look at the proportion of missing data for each variant.
 variant_miss <- read_delim("~/my_materials/filtering/variants.lmiss", delim = "\t",
                        col_names = c("chr", "pos", "nchr", "nfiltered", "nmiss", "fmiss"), skip = 1)
 
-p <- ggplot(variant_miss, aes(fmiss)) + geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) +
-  theme_classic()
+p <- ggplot(variant_miss, aes(fmiss)) + 
+        geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) +
+        theme_classic()
 p 
 
 summary(variant_miss$fmiss)
@@ -317,7 +319,8 @@ Next we can summarize the results by individual.
 indiv_depth <- read_delim("~/my_materials/filtering/variants.idepth", delim = "\t",
                         col_names = c("ind", "nsites", "depth"), skip = 1)
 
-p <- ggplot(indiv_depth, aes(depth)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+p <- ggplot(indiv_depth, aes(depth)) + 
+        geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
         theme_classic()
 p 
 
@@ -331,7 +334,8 @@ summary(indiv_depth$depth)
 
 indiv_miss  <- read_delim("~/my_materials/filtering/variants.imiss", delim = "\t",
                         col_names = c("ind", "ndata", "nfiltered", "nmiss", "fmiss"), skip = 1)
-p <- ggplot(indiv_miss, aes(fmiss)) + geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+p <- ggplot(indiv_miss, aes(fmiss)) + 
+        geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
         theme_classic()
 p 
 
@@ -363,15 +367,15 @@ vcftools --vcf $VCF \
 
 <div class = "text-box">
 
-Change a few parameters and filter your vcf. 
+- Make some decisions for setting your parameters and filter your vcf. Do this with a partner.
+- Count how many SNPs you have. 
+- Change some of your parameters and refilter -> How does this change the number of SNPs you have?
 
-How does this change the number of SNPs you have?
+To dicuss as a class:
 
-What filtering options make you lost the highest number of SNPs?
-
-Which parameters do you think are most important?
-
-How do we balance filtering and retaining informative SNPs?
+- What filtering options make you lose the highest number of SNPs?
+- Which parameters do you think are most important?
+- How do we balance filtering and retaining informative SNPs?
 
 </div>
 

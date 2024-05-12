@@ -75,7 +75,7 @@ There are two main places things are stored:
 
 <br>
 
-**any data or files your generate that are not saves in `my_materials` will be deleted when you log out!** 
+**any data or files your generate that are not saved in `my_materials` will be deleted when you log out!** 
 
 <br>
 

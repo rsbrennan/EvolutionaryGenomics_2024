@@ -1717,14 +1717,15 @@ putatively under selection.</p>
 <p>How would we identify outliers?</p>
 </div>
 <p><br></p>
-<div id="smoothed-average" class="section level4">
-<h4>Smoothed average</h4>
+</div>
+<div id="smoothed-average" class="section level3">
+<h3>Smoothed average</h3>
 <p>And we can add a smoothed average to get broad patterns across the
 genome.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>chr1 <span class="ot">&lt;-</span> <span class="fu">calc_smoothed_averages</span>(<span class="at">x =</span> my.dat, </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">facets =</span> <span class="st">&quot;pop.CHROM&quot;</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">sigma =</span> <span class="dv">50</span>, <span class="co"># using a window size of 50 kb</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">step =</span> <span class="dv">25</span>) <span class="co"># using a step size of 10kb between windows</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">step =</span> <span class="dv">10</span>) <span class="co"># using a step size of 10kb between windows</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># pull out the smoothed values</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>fst_smooth <span class="ot">&lt;-</span> <span class="fu">get.snpR.stats</span>(chr1, <span class="at">facets =</span> <span class="st">&quot;pop.CHROM&quot;</span>, <span class="at">stats =</span><span class="st">&quot;fst&quot;</span>)<span class="sc">$</span>pairwise.window</span>
@@ -1744,27 +1745,25 @@ genome.</p>
 </div>
 <p><br></p>
 </div>
-<div id="classic-manhattan-plot" class="section level4">
-<h4>“Classic” manhattan plot</h4>
+<div id="classic-manhattan-plot" class="section level3">
+<h3>“Classic” manhattan plot</h3>
 <p>Our previous plot was only one chromosome. We might want to plot all
 our chromosomes. We can use the <a href="https://github.com/stephenturner/qqman">qqman</a> package to do
 this. This might be useful for some of you in your projects later.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;qqman&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qqman)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># subset data to just one comparison:</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>HP_PC <span class="ot">&lt;-</span> fst_out <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comparison <span class="sc">==</span>  <span class="st">&quot;HP~PC&quot;</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># make a new dataframe that fits the qqman requirements:</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>qqdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">SNP =</span> HP_PC<span class="sc">$</span>ID,</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">CHR =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(HP_PC<span class="sc">$</span>CHROM, <span class="dv">4</span>,<span class="dv">4</span>)),</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                   <span class="at">BP =</span> HP_PC<span class="sc">$</span>position,</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                   <span class="at">P =</span> HP_PC<span class="sc">$</span>fst</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># make the manhattan plot</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">manhattan</span>(qqdf,<span class="at">logp =</span> <span class="cn">FALSE</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>))</span></code></pre></div>
-</div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qqman)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># subset data to just one comparison:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>HP_PC <span class="ot">&lt;-</span> fst_out <span class="sc">%&gt;%</span> <span class="fu">filter</span>(comparison <span class="sc">==</span>  <span class="st">&quot;HP~PC&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># make a new dataframe that fits the qqman requirements:</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>qqdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">SNP =</span> HP_PC<span class="sc">$</span>ID,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">CHR =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(HP_PC<span class="sc">$</span>CHROM, <span class="dv">4</span>,<span class="dv">4</span>)),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">BP =</span> HP_PC<span class="sc">$</span>position,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                   <span class="at">P =</span> HP_PC<span class="sc">$</span>fst</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># make the manhattan plot</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">manhattan</span>(qqdf,<span class="at">logp =</span> <span class="cn">FALSE</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">ylab=</span><span class="st">&quot;Fst&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="statistical-test-for-outliers" class="section level1">
@@ -1876,25 +1875,16 @@ in our populations. We need to drop these.</p>
 <p>Talk about what outflank is doing.</p>
 </div>
 <p><br></p>
-<p>Now we can pull out the outliers</p>
-<p>BROKEN!!!!</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(OF<span class="sc">$</span>results<span class="sc">$</span>OutlierFlag <span class="sc">==</span> <span class="cn">TRUE</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>P1 <span class="ot">&lt;-</span> <span class="fu">pOutlierFinderChiSqNoCorr</span>(fst,<span class="at">Fstbar=</span>OF<span class="sc">$</span>FSTNoCorrbar,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">dfInferred=</span>OF<span class="sc">$</span>dfInferred,<span class="at">qthreshold=</span><span class="fl">0.05</span>,<span class="at">Hmin=</span><span class="fl">0.1</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>outliers <span class="ot">&lt;-</span> <span class="fu">which</span>(P1<span class="sc">$</span>OutlierFlag <span class="sc">==</span><span class="cn">TRUE</span>) <span class="co">#which of the SNPs are outliers? Note that this only returns the index</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(outliers)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># note that we&#39;re ignoring loci with heterozygosity below 0.1, because outflank ignores these.</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(P1<span class="sc">$</span>indexOrder[P1<span class="sc">$</span>He<span class="sc">&gt;</span><span class="fl">0.1</span>], P1<span class="sc">$</span>FST[P1<span class="sc">$</span>He<span class="sc">&gt;</span><span class="fl">0.1</span>],</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;Position&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;FST&quot;</span>, <span class="at">col=</span><span class="fu">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="fl">0.2</span>))</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(P1<span class="sc">$</span>indexOrder[outliers], P1<span class="sc">$</span>FST[outliers], <span class="at">col=</span><span class="st">&quot;magenta&quot;</span>, <span class="at">pch=</span><span class="dv">20</span>)  </span></code></pre></div>
-<p>But you should notice that our plot doesn’t show chromsosomes. Let’s
-go back to our manhattan plot with qqman and make this look better:</p>
+<p>Now we can pull out the outliers.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>P1 <span class="ot">&lt;-</span> <span class="fu">pOutlierFinderChiSqNoCorr</span>(fst,<span class="at">Fstbar=</span>OF<span class="sc">$</span>FSTNoCorrbar,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">dfInferred=</span>OF<span class="sc">$</span>dfInferred,<span class="at">qthreshold=</span><span class="fl">0.05</span>,<span class="at">Hmin=</span><span class="fl">0.1</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>outliers <span class="ot">&lt;-</span> P1<span class="sc">$</span>LocusName[<span class="fu">which</span>(P1<span class="sc">$</span>OutlierFlag <span class="sc">==</span><span class="cn">TRUE</span>)] <span class="co">#which of the SNPs are outliers? Note that this only returns the index</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(outliers)</span></code></pre></div>
+<p>Now we can make a manhattan plot:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make a new dataframe that fits the qqman requirements:</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>qqdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">SNP =</span> fst<span class="sc">$</span>ID,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>qqdf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">SNP =</span> HP_PC<span class="sc">$</span>ID,</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">CHR =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(HP_PC<span class="sc">$</span>CHROM, <span class="dv">4</span>,<span class="dv">4</span>)),</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">BP =</span> HP_PC<span class="sc">$</span>position,</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">P =</span> HP_PC<span class="sc">$</span>fst)</span>

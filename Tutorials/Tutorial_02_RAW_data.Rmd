@@ -145,6 +145,7 @@ We can then run fastqc for our forward read:
 # move to your quality_control directory before running this code
 
 fastqc ~/shared_materials/tutorial_files/TR-023_RA.fastq.gz -o .
+
 ```
 
 You can look at the results of this program by opening (double clicking) the html file in the browswer in cloudlab.

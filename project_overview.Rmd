@@ -48,6 +48,15 @@ You'll do this project in pairs. With your partner, look through the possible da
 
 All data can be found on cloudlab under `shared_materials`.
 
+# Grades
+
+Grades will be based on two components:
+
+1. Submitted markdown file containing your analyses. 
+2. Poster and presentation on the poster day. 
+
+Please turn in both the analysis file and poster in digital email to Reid and Jenny by the poster day. 
+
 <br>
 
 # Some additional advice
@@ -57,9 +66,9 @@ Things to consider would be:
 - How many snps are in my data?
 - How much missing data? What is the sequencing depth? Other quality measures.
 - Is there evidence for population structure
-  - PCA, Admixture, Fst estimates, isolation by distance
+  - PCA, dapc, Admixture, Fst estimates, isolation by distance
 - What is the genetic diversity of your populations?
-  - pi, Fis, etc.
+  - pi, heterozygosity, etc.
 - Is there any evidence for selection?
   - outflank, Fst scans...
 
