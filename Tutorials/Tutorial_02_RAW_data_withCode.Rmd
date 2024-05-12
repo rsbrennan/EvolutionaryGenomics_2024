@@ -66,7 +66,7 @@ Why do we have two files for one sample?
 
 <br>
 
-These files are in fastq format, shown below:
+These files are in  fastq format, shown below:
 
 ```
 @J00113:190:HFV3LBBXX:7:1101:3742:1297 1:N:0:NAGCTT
@@ -135,19 +135,26 @@ We first need to make a directory to hold the output from these quality control 
 
 We will use [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) to check the quality of our sequencing. Briefly, this program scans our fastq files and checks for quality, contamination from adapters, and sequence bias, among others. 
 
+Look at the help page of fastqc using `fastqc --help`
+
+We can then run fastqc for our forward read: 
+
+
+```bash
+
+# move to your quality_control directory before running this code
+
+fastqc ~/shared_materials/tutorial_files/TR-023_RA.fastq.gz -o .
+
+```
+
+You can look at the results of this program by opening (double clicking) the html file in the browswer in cloudlab.
 
 <br>
 
 <div class="text-box">
-
-- Look at the help page of fastqc using `fastqc --help`
-- Run fastqc on your forward read.
-
-You can look at the results of this program by opening (double clicking) the html file in the browswer in cloudlab.
-
-- Modify your code to run fastqc on your reverse read.
+- Modify the above code to run fastqc on your reverse read.
 - Discuss the output of fastqc together.
-
 </div>
 
 <br>

@@ -1955,18 +1955,17 @@ quality control steps.</p>
 to check the quality of our sequencing. Briefly, this program scans our
 fastq files and checks for quality, contamination from adapters, and
 sequence bias, among others.</p>
-<p>Look at the help page of fastqc using <code>fastqc --help</code></p>
-<p>We can then run fastqc for our forward read:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># move to your quality_control directory before running this code</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">fastqc</span> ~/shared_materials/tutorial_files/TR-023_RA.fastq.gz <span class="at">-o</span> .</span></code></pre></div>
-<p>You can look at the results of this program by opening (double
-clicking) the html file in the browswer in cloudlab.</p>
 <p><br></p>
 <div class="text-box">
 <ul>
-<li>Modify the above code to run fastqc on your reverse read.</li>
+<li>Look at the help page of fastqc using
+<code>fastqc --help</code></li>
+<li>Run fastqc on your forward read.</li>
+</ul>
+<p>You can look at the results of this program by opening (double
+clicking) the html file in the browswer in cloudlab.</p>
+<ul>
+<li>Modify your code to run fastqc on your reverse read.</li>
 <li>Discuss the output of fastqc together.</li>
 </ul>
 </div>
@@ -1998,10 +1997,10 @@ reads</li>
 be considered a match.</li>
 </ul>
 <p>Run trim galore on your data.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">trim_galore</span> <span class="at">--paired</span> <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>      ~/shared_materials/tutorial_files/TR-023_RA.fastq.gz <span class="dt">\</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>      ~/shared_materials/tutorial_files/TR-023_RB.fastq.gz <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">-q</span> 30 <span class="at">--length</span> 30 <span class="at">--stringency</span> 4</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">trim_galore</span> <span class="at">--paired</span> <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      ~/shared_materials/tutorial_files/TR-023_RA.fastq.gz <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      ~/shared_materials/tutorial_files/TR-023_RB.fastq.gz <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">-q</span> 30 <span class="at">--length</span> 30 <span class="at">--stringency</span> 4</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
 <p>After trim_galore finishes, run fastqc on your newly trimmed
