@@ -108,11 +108,11 @@ Instead, we need to use `|`, or a pipe. So we can pipe the output of `zcat` to a
 
 `zcat TR-023_RA.fastq.gz  | head`
 
-We can also count how many lines are in our file. you do this with `wc -l`. 
+We can also count how many lines are in our file. 
 
 <div class="text-box">
 
-Use `zcat`, `|`, and `wc -l` to count the number of reads in your fastq files.  
+Count the number of reads in your fastq files.  
 
 - How many reads do you have?   
 - Do the number of forward and reverse reads agree? Why?

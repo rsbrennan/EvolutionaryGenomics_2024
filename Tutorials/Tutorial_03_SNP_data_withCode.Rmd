@@ -201,30 +201,11 @@ Do this now.
 
 Next we will calcluate various statistics for our vcf file. 
 
-<br>
-
-<div class = "text-box">
-
-Go to the vcftools manual: https://vcftools.github.io/man_latest.html
-
-Look up how to calculate:
-
-- mean depth per individual
-- mean depth per site
-
-Calculate both of these now. Remember to use `$VCF` and `$OUT`
-
-Then move on to calculate the statistics below. 
-
-</div>
-
-<br>
-
-
 
 ### mean depth per individual
 
 ``` {bash, eval=FALSE}
+vcftools --vcf $VCF --depth --out $OUT
 
 ```
 
@@ -233,6 +214,7 @@ Output file: `variants.idepth`
 ### mean depth per site
 
 ``` {bash, eval=FALSE}
+vcftools --vcf $VCF --site-mean-depth --out $OUT
 
 ```
 
@@ -307,26 +289,62 @@ summary(variant_depth$mean_depth)
 
 ```
 
+### variant missingness
+
+Next, we look at the proportion of missing data for each variant.
+
+```{r, eval=F}
+variant_miss <- read_delim("~/my_materials/filtering/variants.lmiss", delim = "\t",
+                       col_names = c("chr", "pos", "nchr", "nfiltered", "nmiss", "fmiss"), skip = 1)
+
+p <- ggplot(variant_miss, aes(fmiss)) + 
+        geom_density(fill = "dodgerblue1", colour = "black", alpha = 0.3) +
+        theme_classic()
+p 
+
+summary(variant_miss$fmiss)
+
+```
 
 <br>
-
-<div class = "text-box">
-
-Make histograms for your other summary statistics:
-
-- variant missingness
-- individual mean depth
-- individual missingness
-
-
-</div>
-
 <br>
 
+## individual statistics
+
+Next we can summarize the results by individual.
+
+### Individual mean depth
+```{r, eval=F}
+
+indiv_depth <- read_delim("~/my_materials/filtering/variants.idepth", delim = "\t",
+                        col_names = c("ind", "nsites", "depth"), skip = 1)
+
+p <- ggplot(indiv_depth, aes(depth)) + 
+        geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+        theme_classic()
+p 
+
+summary(indiv_depth$depth)
+
+
+```
+
+### Individual missing data
+```{r, eval=F}
+
+indiv_miss  <- read_delim("~/my_materials/filtering/variants.imiss", delim = "\t",
+                        col_names = c("ind", "ndata", "nfiltered", "nmiss", "fmiss"), skip = 1)
+p <- ggplot(indiv_miss, aes(fmiss)) + 
+        geom_histogram(fill = "dodgerblue1", colour = "black", alpha = 0.3) + 
+        theme_classic()
+p 
+
+summary(indiv_miss$fmiss)
+```
 
 ## Filtering VCF
 
-If we saw issues above, we could add additional filters to our data. You can do this in vcftools. It would look something like this where you would replace $NUM with your threshold (which would be different for each command). You also need to add `recode` when writing a new vcf file. And you choose the name of your filtered vcf with the `--out` variable.
+If we saw issues above, we could add additional filters to our data. You can do this in vcftools. It woud look something like this where you would replace $NUM with your threshold (which would be different for each command). You also need to add `recode` when writing a new vcf file. And you choose the name of your filtered vcf with the `--out` variable.
 
 See the vcftools manual for more info.
 
