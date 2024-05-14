@@ -1695,16 +1695,7 @@ better options to make this easier?</p>
 <p><br></p>
 <div class="text-box">
 <p>We will walk through writing a loop.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> pop <span class="kw">in</span> TR PC BC HP GA<span class="kw">;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">vcftools</span> <span class="at">--vcf</span> <span class="va">$VCF</span> <span class="dt">\</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>--keep ~/shared_materials/tutorial_files/<span class="va">${pop}</span>.pop <span class="dt">\</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>--window-pi 50000 <span class="dt">\</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>--out <span class="va">${pop}</span>_pi_50kb<span class="kw">;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
 </div>
 <p><br></p>
 <p>This loop is saying, for each of our population id’s
@@ -1759,7 +1750,10 @@ results.</p>
 <div class="text-box">
 <p>How would you check that your <code>bind_rows</code> function worked
 correctly and your final dataframe is complete?</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_int</span>(d, nrow)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to get the number of rows in d</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map_int</span>(d, nrow)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># you also need to count up your final dataframe rows.</span></span></code></pre></div>
 </div>
 <p><br></p>
 </div>
@@ -1781,13 +1775,14 @@ correctly and your final dataframe is complete?</p>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean =</span> <span class="fu">mean</span>(PI), <span class="at">sd =</span> <span class="fu">sd</span>(PI), <span class="at">median =</span> <span class="fu">median</span>(PI))</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
-<p>Do you think there are differences in pi between the populations?</p>
-<p>How might you add more confidence to your conclusion?</p>
 <ul>
-<li><code>ks.test()</code></li>
+<li>Do you think there are differences in pi between the
+populations?<br />
+</li>
+<li>How might you add more confidence to your conclusion?</li>
+<li>What effect do you think window size has on your estimates? Go back
+and change this value to see what happens.</li>
 </ul>
-<p>What effect do you think window size has on your estimates? Go back
-and change this value to see what happens.</p>
 </div>
 <p><br></p>
 </div>
@@ -1973,9 +1968,7 @@ loops!</p>
 <p><br></p>
 <div class="text-box">
 <p>Write a loop to iterate over your k values.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> K <span class="kw">in</span> 1 2 3 4 5<span class="kw">;</span> <span class="dt">\</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span> <span class="ex">admixture</span> <span class="at">--cv</span> variants_NoLD.bed <span class="va">$K</span> <span class="kw">|</span> <span class="fu">tee</span> log<span class="va">${K}</span>.out<span class="kw">;</span> <span class="cf">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
 </div>
 <p><br></p>
 <p>and we need to grab the cross validation scores, to determine the
@@ -1985,7 +1978,10 @@ most likely K:</p>
 <p><code>grep</code> is saying to find lines with <code>CV</code> in our
 log files and print them. We then drop the first few columns so it is
 easier to plot next. We will come back to these shortly.</p>
-<p><br> ### plot the ADMIXTURE results</p>
+<p><br></p>
+</div>
+<div id="plot-the-admixture-results" class="section level3">
+<h3>plot the ADMIXTURE results</h3>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>samplelist <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;~/shared_materials/tutorial_files/indivs.txt&quot;</span>,</span>
@@ -2131,20 +2127,11 @@ with vcftools.</p>
 <p>Plot your data to see if there is isolation by distance.</p>
 </div>
 <p><br></p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span>  <span class="fu">ggplot</span>(dist.df,<span class="fu">aes</span>(<span class="at">x=</span>distance,<span class="at">y=</span>weighted_mean_fst)) <span class="sc">+</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>p</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># and we can add the population labels</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">geom_text</span>(<span class="at">label=</span>dist.df<span class="sc">$</span>subfacet)</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
 <p>How would you add statistical strength to your conclusion?</p>
 </div>
 <p><br></p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># then add a regression line:</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>p <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">method=</span>lm)</span></code></pre></div>
 <p><br></p>
 <div class="text-box">
 <p>I hope you’ll see that these results look a little funny. Can you

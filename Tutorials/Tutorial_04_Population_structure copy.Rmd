@@ -99,6 +99,15 @@ We will walk through writing a loop.
 
 ```{bash, eval=F}
 
+for pop in TR PC BC HP GA;
+do
+
+vcftools --vcf $VCF \
+--keep ~/shared_materials/tutorial_files/${pop}.pop \
+--window-pi 50000 \
+--out ${pop}_pi_50kb;
+
+done
 
 ```
 
@@ -160,12 +169,7 @@ How would you check that your `bind_rows` function worked correctly and your fin
 
 ```{r, eval=F}
 
-# to get the number of rows in d
 map_int(d, nrow)
-
-# you also need to count up your final dataframe rows.
-
-
 
 ```
 
@@ -199,9 +203,13 @@ meltdat %>%
 
 <div class="text-box">
 
-- Do you think there are differences in pi between the populations?  
-- How might you add more confidence to your conclusion?
-- What effect do you think window size has on your estimates? Go back and change this value to see what happens.
+Do you think there are differences in pi between the populations?  
+
+How might you add more confidence to your conclusion?
+
+- `ks.test()`
+
+What effect do you think window size has on your estimates? Go back and change this value to see what happens.
 
 </div>
 
@@ -403,6 +411,9 @@ Write a loop to iterate over your k values.
 
 ```{bash, eval=F}
 
+for K in 1 2 3 4 5; \
+do admixture --cv variants_NoLD.bed $K | tee log${K}.out; done
+
 ```
 </div>
 
@@ -419,7 +430,6 @@ grep -h CV log*.out | cut -f 3- -d " " > cv.txt
 `grep` is saying to find lines with `CV` in our log files and print them. We then drop the first few columns so it is easier to plot next. We will come back to these shortly.
 
 <br>
-
 ### plot the ADMIXTURE results
 
 ```{r, eval=F}
@@ -614,6 +624,15 @@ Plot your data to see if there is isolation by distance.
 ```{r, eval=F}
 
 
+p <-  ggplot(dist.df,aes(x=distance,y=weighted_mean_fst)) + 
+  geom_point() +
+  theme_classic()
+p
+
+# and we can add the population labels
+p <- p + geom_text(label=dist.df$subfacet)
+
+
 ```
 
 
@@ -630,6 +649,9 @@ How would you add statistical strength to your conclusion?
 
 
 ```{r, eval=F}
+
+# then add a regression line:
+p + geom_smooth(method=lm)
 
 
 ```
