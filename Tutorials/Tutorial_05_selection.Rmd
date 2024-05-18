@@ -372,3 +372,74 @@ Look at the other outlier regions more closely like we did with qqman. Do you th
 </div>
 
 <br>
+
+
+
+# PCAdapt
+
+install.packages("pcadapt")
+library(pcadapt)
+
+path_to_file <- "~/my_materials/population_structure/variants_NoLD.bed"
+filename <- read.pcadapt(path_to_file, type = "bed")
+
+# Choosing the number K of Principal Components
+x <- pcadapt(input = filename, K = 20) 
+
+plot(x, option = "screeplot")
+# keep to left of traight line
+
+# read in individual ids, in same order as vcf/plink file
+population <- read.table("~/shared_materials/tutorial_files/pops.txt",
+                          header=F)
+plot(x, option = "scores", pop = population$V1)
+
+plot(x, option = "scores", i = 3, j = 4, pop = population$V1)
+
+plot(x , option = "manhattan")
+
+
+# thin for ld
+res <- pcadapt(input = filename, K = 20, LD.clumping = list(size = 200, thr = 0.1))
+plot(x, option = "scores", pop = population$V1)
+plot(res, option = "screeplot")
+plot(res)
+
+
+hist(x$pvalues, xlab = "p-values", main = NULL, breaks = 50, col = "orange")
+
+plot(x, option = "stat.distribution")
+
+
+
+library(qvalue)
+qval <- qvalue(x$pvalues)$qvalues
+alpha <- 0.01
+outliers <- which(qval < alpha)
+length(outliers)
+
+# manhattan plot
+
+library(qqman)
+
+# make a new dataframe that fits the qqman requirements:
+##
+infs <- read.table("~/my_materials/population_structure/variants_NoLD.bim")
+
+qqdf <- data.frame(SNP = infs$V2,
+                   CHR = infs$V1,
+                   BP = infs$V4,
+                   P = x$pvalues
+)
+
+sigloci <- qqdf$SNP[outliers]
+
+# make the manhattan plot
+library(qqman)
+manhattan(qqdf,logp = TRUE, ylab="Fst", highlight = sigloci, ylim=c(0,80))
+
+
+# can also filter by LD even more.
+
+See PCAdapt website.
+

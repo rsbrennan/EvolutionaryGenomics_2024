@@ -99,6 +99,16 @@ We will walk through writing a loop.
 
 ```{bash, eval=F}
 
+for $pop in BC GA HP PC TR;
+do
+
+vcftools --vcf $VCF \
+--keep ~/shared_materials/tutorial_files/$pop.pop \
+--window-pi 50000 \
+--out $pop
+done
+
+
 
 ```
 

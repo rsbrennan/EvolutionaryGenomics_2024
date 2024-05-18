@@ -172,7 +172,7 @@ Our vcf file is in the the shared folder, which you cannot write to. We can do a
 
 ```{bash, eval=FALSE}
 VCF=~/shared_materials/tutorial_files/variants.vcf
-OUT=~/my_materials/filtering/variants
+OUT=~/my_materials/filtering/variants/
 
 ```
 
@@ -245,7 +245,6 @@ As a reminder, we have the following files to look at:
 - mean depth per site: `variants.ldepth.mean`  
 - Missingness per individual: `variants.imiss`  
 - Missingness per site: `variants.lmiss`  
-- Site quality: `variants.lqual`  
 
 For all of the following, you need to use tidyverse.
 
