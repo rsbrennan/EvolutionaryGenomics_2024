@@ -85,9 +85,11 @@ paste dataset_2_population.txt dataset_2_indiv.txt > dataset_2_IDs.txt
 
 <br>
 
-The vcf file for this dataset is located: `shared_materials/Project_files/dataset_2/dataset_2.vcf`
-
-There is also a file with the id and population of each individuals: `shared_materials/Project_files/Dataset_2/dataset_2_IDs.txt`
+- The vcf file for this dataset is located: `shared_materials/Project_files/dataset_2/dataset_2.vcf`
+- There is also a file with the id and population of each individuals: `shared_materials/Project_files/Dataset_2/dataset_2_IDs.txt`
+- population files are in the `pop_files` directory.
+- latitute/longitude: `dataset_2_lat_long.txt`
+- pairwise distances: `pairwise_distances.txt`
 
 
 
