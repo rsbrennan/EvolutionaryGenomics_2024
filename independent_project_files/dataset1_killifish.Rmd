@@ -88,6 +88,8 @@ We used a sequence capture approach called Rapture. See the [paper describing it
 - pairwise distances between populations: `shared_materials/Project_files/dataset_1/dataset_1_pairwise_distances.txt`
 - There is no phenotype data for these individuals.
 
+!!!!!!!!! For next year- remember that the chr names cause problems in admixture!!!!!!!!! should fix them to remove the `NW_` and `.1`.
+
 
 
 
